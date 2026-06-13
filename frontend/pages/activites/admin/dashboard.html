@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Activités</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: white; border-radius: 16px; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; }
+        .stat-icon { width: 50px; height: 50px; background: #667eea; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; }
+        .stat-value { font-size: 1.75rem; font-weight: bold; }
+        .chart-card { background: white; border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><i class="fas fa-city"></i><span>Admin Municipal</span></div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="active"><i class="fas fa-chart-line"></i> Tableau de bord</a>
+                <a href="activites.html"><i class="fas fa-calendar-alt"></i> Activités</a>
+                <a href="inscriptions.html"><i class="fas fa-users"></i> Inscriptions</a>
+            </nav>
+        </aside>
+        <main class="admin-main">
+            <header class="admin-header"><h1>Tableau de bord des activités</h1></header>
+            <div class="admin-stats" id="stats"></div>
+            <div class="chart-card"><canvas id="inscriptionsChart"></canvas></div>
+        </main>
+    </div>
+    <script>
+        const API_BASE = 'http://localhost:8000/api/activites';
+        const token = localStorage.getItem('auth_token');
+        if (!token) window.location.href = '../../accounts/login.html';
+        
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/dashboard/stats/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                document.getElementById('stats').innerHTML = `
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-alt"></i></div><div><div class="stat-value">${data.total_activites || 0}</div><div>Activités</div></div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div><div class="stat-value">${data.total_inscriptions || 0}</div><div>Inscriptions</div></div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div><div class="stat-value">${data.total_inscriptions_confirmees || 0}</div><div>Confirmées</div></div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-money-bill"></i></div><div><div class="stat-value">${(data.chiffre_affaires || 0).toLocaleString()} FCFA</div><div>Chiffre d'affaires</div></div></div>
+                `;
+                if (data.inscriptions_par_mois) {
+                    new Chart(document.getElementById('inscriptionsChart'), {
+                        type: 'line', data: { labels: data.inscriptions_par_mois.map(i => i.mois), datasets: [{ label: 'Inscriptions', data: data.inscriptions_par_mois.map(i => i.count), borderColor: '#667eea', fill: false }] }
+                    });
+                }
+            } catch (error) { console.error('Erreur:', error); }
+        }
+        loadStats();
+    </script>
+</body>
+</html>

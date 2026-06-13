@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signer un document - Signature électronique</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <link rel="stylesheet" href="../../css/modules/signature.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">[MENU]</nav>
+
+    <div class="signature-header">
+        <h1><i class="fas fa-pen-fancy"></i> Signer un document</h1>
+        <p>Apposez votre signature électronique</p>
+    </div>
+
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-section-title"><i class="fas fa-file-alt"></i> Informations du document</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Module concerné</label>
+                    <select id="moduleSource" class="filter-select">
+                        <option value="etat_civil">🏛️ État Civil</option>
+                        <option value="archives">📚 Archives</option>
+                        <option value="activites">🎯 Activités</option>
+                        <option value="dechets">🗑️ Déchets</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Référence du document</label>
+                    <input type="text" id="sourceId" class="search-input" placeholder="Ex: NAISS-2024-001">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Titre du document</label>
+                <input type="text" id="documentTitre" class="search-input" placeholder="Titre du document à signer">
+            </div>
+
+            <div class="form-section-title"><i class="fas fa-paint-brush"></i> Modèles de signature</div>
+            <div class="modeles-grid" id="modelesGrid">
+                <div class="modele-card" data-modele="classique">
+                    <i class="fas fa-font" style="font-size: 24px;"></i>
+                    <div class="preview">Signature</div>
+                    <span>Classique</span>
+                </div>
+                <div class="modele-card" data-modele="elegant">
+                    <i class="fas fa-feather-alt" style="font-size: 24px;"></i>
+                    <div class="preview">Sincerely</div>
+                    <span>Élégant</span>
+                </div>
+                <div class="modele-card" data-modele="officiel">
+                    <i class="fas fa-gavel" style="font-size: 24px;"></i>
+                    <div class="preview">Approuvé</div>
+                    <span>Officiel</span>
+                </div>
+            </div>
+
+            <div class="form-section-title"><i class="fas fa-draw-polygon"></i> Zone de signature</div>
+            <div class="signature-area">
+                <canvas id="signatureCanvas" class="signature-canvas" width="500" height="150"></canvas>
+                <div class="signature-actions">
+                    <button class="btn-secondary" onclick="clearCanvas()">🔄 Effacer</button>
+                </div>
+            </div>
+
+            <div class="form-section-title"><i class="fas fa-lock"></i> Authentification</div>
+            <div class="form-group">
+                <label>Mot de passe du certificat</label>
+                <input type="password" id="motDePasse" class="search-input" placeholder="Votre mot de passe">
+            </div>
+            <div class="form-group">
+                <label>Niveau de signature</label>
+                <select id="niveauSignature" class="filter-select">
+                    <option value="1">Signature simple</option>
+                    <option value="2">Signature avancée (code PIN)</option>
+                    <option value="3">Signature qualifiée (biométrie)</option>
+                </select>
+            </div>
+            <div id="codePinGroup" class="form-group" style="display: none;">
+                <label>Code PIN</label>
+                <input type="password" id="codePin" class="search-input" placeholder="Code à 6 chiffres" maxlength="6">
+            </div>
+
+            <button class="btn-primary" onclick="signerDocument()" style="width: 100%; margin-top: 20px;">
+                <i class="fas fa-signature"></i> Signer le document
+            </button>
+        </div>
+    </div>
+
+    <script src="../../js/api.js"></script>
+    <script src="../../js/modules/signature.js"></script>
+</body>
+</html>

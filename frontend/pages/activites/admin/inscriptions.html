@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des inscriptions - Admin</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <aside class="admin-sidebar">...</aside>
+        <main class="admin-main">
+            <h1>Gestion des inscriptions</h1>
+            <table class="admin-table">
+                <thead><tr><th>Référence</th><th>Activité</th><th>Nom</th><th>Email</th><th>Statut</th><th>Montant</th><th>Actions</th></tr></thead>
+                <tbody id="inscriptions-list"><tr><td colspan="7">Chargement...</td></tr></tbody>
+            </table>
+        </main>
+    </div>
+    <script>
+        const API_BASE = 'http://localhost:8000/api/activites';
+        const token = localStorage.getItem('auth_token');
+        if (!token) window.location.href = '../../accounts/login.html';
+        
+        async function loadInscriptions() {
+            try {
+                const response = await fetch(`${API_BASE}/inscriptions/?page_size=100`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await response.json();
+                const tbody = document.getElementById('inscriptions-list');
+                if (data.results && data.results.length) {
+                    tbody.innerHTML = data.results.map(ins => `<tr><td>${ins.reference}</td><td>${ins.activite_titre || ins.activite}</td><td>${ins.nom_complet}</td><td>${ins.email}</td><td><span class="status-badge">${ins.statut}</span></td><td>${ins.montant_total} FCFA</td><td><button onclick="confirmer(${ins.id})" style="background:#10b981; border:none; padding:0.25rem 0.5rem; border-radius:5px; color:white;">✅</button></td></tr>`).join('');
+                } else { tbody.innerHTML = '<tr><td colspan="7">Aucune inscription</td></tr>'; }
+            } catch (error) { console.error('Erreur:', error); }
+        }
+        async function confirmer(id) { await fetch(`${API_BASE}/inscriptions/${id}/confirmer/`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } }); loadInscriptions(); }
+        loadInscriptions();
+    </script>
+</body>
+</html>

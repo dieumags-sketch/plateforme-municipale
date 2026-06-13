@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail de l'activité - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/activites.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .detail-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .detail-header { margin-bottom: 2rem; }
+        .detail-title { font-size: 2.5rem; color: #1f2937; margin: 1rem 0; }
+        .detail-meta { display: flex; gap: 2rem; flex-wrap: wrap; padding: 1rem 0; border-bottom: 1px solid #e5e7eb; }
+        .detail-meta-item { display: flex; align-items: center; gap: 0.5rem; color: #6b7280; }
+        .detail-image { border-radius: 20px; overflow: hidden; margin: 1.5rem 0; }
+        .detail-image img { width: 100%; max-height: 400px; object-fit: cover; }
+        .detail-description { line-height: 1.8; color: #374151; }
+        .inscription-panel { background: #f9fafb; border-radius: 20px; padding: 1.5rem; margin-top: 2rem; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .loading-spinner { display: flex; justify-content: center; padding: 3rem; }
+        .spinner { width: 50px; height: 50px; border: 3px solid #e2e8f0; border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .toast-notification { position: fixed; bottom: 20px; right: 20px; padding: 1rem 1.5rem; border-radius: 12px; color: white; z-index: 9999; animation: slideIn 0.3s ease; }
+        .toast-success { background: #10b981; }
+        .toast-error { background: #ef4444; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-city"></i> Plateforme Municipale</div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/index.html">Actualités</a></li>
+                <li><a href="index.html" class="active">Activités</a></li>
+                <li><a href="mes-inscriptions.html">Mes inscriptions</a></li>
+                <li><a href="../accounts/profile.html">Mon compte</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="detail-container" class="detail-container">
+        <div class="loading-spinner"><div class="spinner"></div></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/activites';
+        const token = localStorage.getItem('auth_token');
+        
+        if (!token) window.location.href = '../accounts/login.html';
+        
+        async function loadDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const activiteId = urlParams.get('id');
+            if (!activiteId) { window.location.href = 'index.html'; return; }
+            
+            try {
+                await fetch(`${API_BASE}/activites/${activiteId}/increment_vue/`, { method: 'POST' });
+                const response = await fetch(`${API_BASE}/activites/${activiteId}/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const act = await response.json();
+                renderDetail(act);
+                
+                const inscritResponse = await fetch(`${API_BASE}/activites/${activiteId}/est_inscrit/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const inscritData = await inscritResponse.json();
+                if (inscritData.inscrit) {
+                    const btn = document.getElementById('inscription-btn');
+                    if (btn) { btn.style.display = 'none'; }
+                    const dejaInscrit = document.getElementById('deja-inscrit');
+                    if (dejaInscrit) { dejaInscrit.style.display = 'block'; }
+                }
+            } catch (error) {
+                document.getElementById('detail-container').innerHTML = '<div class="error">Erreur de chargement</div>';
+            }
+        }
+        
+        function renderDetail(act) {
+            const container = document.getElementById('detail-container');
+            container.innerHTML = `
+                <div class="detail-header">
+                    <h1 class="detail-title">${escapeHtml(act.titre)}</h1>
+                    <div class="detail-meta">
+                        <div class="detail-meta-item"><i class="fas fa-calendar"></i> ${formatDate(act.date_debut)}</div>
+                        <div class="detail-meta-item"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(act.lieu)}, ${escapeHtml(act.ville)}</div>
+                        <div class="detail-meta-item"><i class="fas fa-users"></i> ${act.nb_inscrits || 0} participants</div>
+                        <div class="detail-meta-item"><i class="fas fa-eye"></i> ${act.vue_count} vues</div>
+                    </div>
+                </div>
+                <div class="detail-image">
+                    <img src="${act.image_principale || 'https://via.placeholder.com/800x400'}" alt="${act.titre}" onerror="this.src='https://via.placeholder.com/800x400'">
+                </div>
+                <div class="detail-description">
+                    <h3>Description</h3>
+                    <p>${act.description_longue || act.description_courte || 'Aucune description disponible'}</p>
+                </div>
+                <div class="inscription-panel">
+                    <h3>Inscription</h3>
+                    <p><strong>💰 Prix :</strong> ${act.est_gratuit ? 'GRATUIT' : `${parseInt(act.prix).toLocaleString()} FCFA`}</p>
+                    <p><strong>📅 Date limite :</strong> ${formatDate(act.date_limite_inscription)}</p>
+                    <p><strong>🎟️ Places restantes :</strong> ${act.places_restantes === -1 ? 'Illimité' : act.places_restantes}</p>
+                    <button id="inscription-btn" class="btn-primary" ${act.places_restantes === 0 ? 'disabled' : ''}>
+                        ${act.places_restantes === 0 ? 'Complet' : (act.est_gratuit ? 'S\'inscrire gratuitement' : 'S\'inscrire et payer')}
+                    </button>
+                    <div id="deja-inscrit" style="display:none; background:#d1fae5; padding:1rem; border-radius:12px; margin-top:1rem;">
+                        ✅ Vous êtes déjà inscrit à cette activité
+                    </div>
+                </div>
+            `;
+            document.getElementById('inscription-btn')?.addEventListener('click', () => {
+                window.location.href = `inscription.html?id=${act.id}`;
+            });
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'Date à définir';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        loadDetail();
+    </script>
+</body>
+</html>

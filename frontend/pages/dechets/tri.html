@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide de tri - Bot-Makak</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .container{max-width:900px;margin:100px auto 2rem;padding:2rem}
+        h1{text-align:center;margin-bottom:2rem}
+        .tri-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.5rem}
+        .tri-card{background:white;border-radius:20px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.05)}
+        .tri-header{height:100px;display:flex;align-items:center;justify-content:center;font-size:2.5rem}
+        .tri-header.vert{background:#d1fae5;color:#059669}
+        .tri-header.jaune{background:#fef3c7;color:#d97706}
+        .tri-header.bleu{background:#dbeafe;color:#3b82f6}
+        .tri-header.marron{background:#fef3c7;color:#8b5cf6}
+        .tri-header.noir{background:#e5e7eb;color:#374151}
+        .tri-content{padding:1.5rem}
+        .tri-content h3{margin-bottom:0.5rem}
+        .tri-content ul{margin-left:1rem;color:#6b7280}
+        .tri-content li{margin-bottom:0.25rem}
+        .astuce{background:#f0fdf4;border-radius:12px;padding:1rem;margin-top:1.5rem}
+    </style>
+</head>
+<body>
+    <nav class="navbar">...</nav>
+    
+    <div class="container">
+        <h1><i class="fas fa-recycle"></i> Guide de tri des déchets</h1>
+        
+        <div class="tri-grid">
+            <div class="tri-card">
+                <div class="tri-header vert">🗑️</div>
+                <div class="tri-content">
+                    <h3>Bac vert - Déchets organiques</h3>
+                    <ul>
+                        <li>Épluchures de fruits/légumes</li>
+                        <li>Restes de repas</li>
+                        <li>Marc de café, sachets de thé</li>
+                        <li>Coquilles d'œufs</li>
+                        <li>Fleurs et plantes fanées</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tri-card">
+                <div class="tri-header jaune">♻️</div>
+                <div class="tri-content">
+                    <h3>Bac jaune - Recyclables</h3>
+                    <ul>
+                        <li>Bouteilles et flacons plastique</li>
+                        <li>Canettes et boîtes de conserve</li>
+                        <li>Briques alimentaires</li>
+                        <li>Journaux, magazines, cartons</li>
+                        <li>Flacons de produits ménagers</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tri-card">
+                <div class="tri-header bleu">📄</div>
+                <div class="tri-content">
+                    <h3>Bac bleu - Papiers</h3>
+                    <ul>
+                        <li>Papiers de bureau</li>
+                        <li>Enveloppes</li>
+                        <li>Cahiers</li>
+                        <li>Papiers cadeaux (non plastifiés)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tri-card">
+                <div class="tri-header marron">🍾</div>
+                <div class="tri-content">
+                    <h3>Bac marron - Verre</h3>
+                    <ul>
+                        <li>Bouteilles en verre</li>
+                        <li>Pots en verre (confiture, etc.)</li>
+                        <li>Flacons en verre</li>
+                        <li>Bocaux</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tri-card">
+                <div class="tri-header noir">🚮</div>
+                <div class="tri-content">
+                    <h3>Bac noir - Déchets non recyclables</h3>
+                    <ul>
+                        <li>Couches</li>
+                        <li>Mouchoirs, essuie-tout</li>
+                        <li>Mégots</li>
+                        <li>Poussière</li>
+                        <li>Stylos, feutres</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="astuce">
+            <h3><i class="fas fa-lightbulb"></i> Astuces pour réduire vos déchets</h3>
+            <p>✅ Compostez vos déchets organiques pour enrichir votre jardin<br>
+            ✅ Utilisez des sacs réutilisables pour vos courses<br>
+            ✅ Évitez les produits suremballés<br>
+            ✅ Donnez ce qui peut être réutilisé (vêtements, jouets, livres)</p>
+        </div>
+    </div>
+</body>
+</html>

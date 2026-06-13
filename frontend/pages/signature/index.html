@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Signature électronique - Commune Bot-Makak</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        .signature-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 60px 0;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .signature-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 16px;
+        }
+        
+        .signature-header h1 i {
+            margin-right: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 60px;
+        }
+        
+        /* Stats certificat */
+        .certif-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: -30px auto 40px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .certif-card {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            text-align: center;
+            min-width: 180px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .certif-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .certif-card i {
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+        
+        .certif-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        .certif-card .label {
+            font-size: 13px;
+            color: var(--gray-600);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .status-valide { background: #d1fae5; color: #059669; }
+        .status-expire { background: #fef3c7; color: #d97706; }
+        .status-absent { background: #fee2e2; color: #dc2626; }
+        
+        /* Grille services */
+        .signature-services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 28px;
+            margin: 40px 0;
+        }
+        
+        .service-card-sig {
+            background: white;
+            border-radius: 24px;
+            padding: 32px 24px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid var(--gray-200);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card-sig::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+        
+        .service-card-sig:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.1);
+        }
+        
+        .service-card-sig:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        
+        .service-icon i {
+            font-size: 40px;
+            color: var(--primary);
+        }
+        
+        .service-card-sig h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+        
+        .service-card-sig p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        
+        .security-level {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+        
+        .level-1 { background: #d1fae5; color: #059669; }
+        .level-2 { background: #e0e7ff; color: #4f46e5; }
+        .level-3 { background: #fef3c7; color: #d97706; }
+        
+        .btn-signature {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-signature:hover {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+            color: white;
+        }
+        
+        /* Dernières signatures */
+        .recent-signatures {
+            background: var(--gray-100);
+            border-radius: 24px;
+            padding: 32px;
+            margin-top: 40px;
+        }
+        
+        .signature-item {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            transition: all 0.3s;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .signature-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .signature-header h1 { font-size: 2rem; }
+            .certif-stats { flex-direction: column; align-items: center; }
+            .certif-card { width: 80%; }
+            .signature-services { grid-template-columns: 1fr; }
+            .signature-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-city"></i>
+                <span>Plateforme Municipale</span>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/">Actualités</a></li>
+                <li><a href="../annuaires/">Annuaires</a></li>
+                <li><a href="../dechets/">Gestion des déchets</a></li>
+                <li><a href="../activites/">Activités</a></li>
+                <li><a href="../accounts/login.html" class="btn-login"><i class="fas fa-user"></i> Connexion</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="signature-header">
+        <h1><i class="fas fa-signature"></i> Signature électronique</h1>
+        <p>Signez vos documents officiels en toute sécurité</p>
+    </div>
+
+    <!-- Statut certificat -->
+    <div class="certif-stats">
+        <div class="certif-card">
+            <i class="fas fa-certificate"></i>
+            <div class="value" id="certifStatut">Non actif</div>
+            <div class="label">Statut certificat</div>
+            <span class="status-badge status-absent" id="certifBadge">À créer</span>
+        </div>
+        <div class="certif-card">
+            <i class="fas fa-shield-alt"></i>
+            <div class="value" id="signatureCount">0</div>
+            <div class="label">Documents signés</div>
+        </div>
+        <div class="certif-card">
+            <i class="fas fa-clock"></i>
+            <div class="value" id="validite">-</div>
+            <div class="label">Validité certificat</div>
+        </div>
+    </div>
+
+    <!-- Services de signature -->
+    <div class="actes-section">
+        <div class="section-header">
+            <h2>✍️ Que souhaitez-vous faire ?</h2>
+            <p>Signature sécurisée conforme à la réglementation</p>
+        </div>
+        
+        <div class="signature-services">
+            <div class="service-card-sig" onclick="window.location.href='signer.html'">
+                <div class="service-icon"><i class="fas fa-pen-fancy"></i></div>
+                <h3>Signer un document</h3>
+                <p>Apposez votre signature électronique</p>
+                <span class="security-level level-1">Niveau 1 - Simple</span>
+                <button class="btn-signature">Commencer <i class="fas fa-arrow-right"></i></button>
+            </div>
+            
+            <div class="service-card-sig" onclick="window.location.href='verifier.html'">
+                <div class="service-icon"><i class="fas fa-check-double"></i></div>
+                <h3>Vérifier une signature</h3>
+                <p>Vérifiez l'authenticité d'un document</p>
+                <span class="security-level level-2">Niveau 2 - Avancé</span>
+                <button class="btn-signature">Vérifier <i class="fas fa-arrow-right"></i></button>
+            </div>
+            
+            <div class="service-card-sig" onclick="window.location.href='certificat.html'">
+                <div class="service-icon"><i class="fas fa-certificate"></i></div>
+                <h3>Mon certificat</h3>
+                <p>Gérez votre identité numérique</p>
+                <span class="security-level level-3">Niveau 3 - Qualifié</span>
+                <button class="btn-signature">Accéder <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations sur la signature -->
+    <div class="actes-section">
+        <div class="recent-signatures">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                <h3><i class="fas fa-history"></i> Mes dernières signatures</h3>
+                <a href="historique.html" style="color: var(--primary);">Voir tout <i class="fas fa-chevron-right"></i></a>
+            </div>
+            <div id="recentSignatures">
+                <div class="empty-state" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-inbox" style="font-size: 48px; opacity: 0.5;"></i>
+                    <p>Aucune signature effectuée</p>
+                    <button class="btn-primary" onclick="window.location.href='signer.html'" style="margin-top: 16px;">Signer un document</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avantages -->
+    <div class="actes-section">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin: 40px 0;">
+            <div style="text-align: center;">
+                <i class="fas fa-lock" style="font-size: 40px; color: var(--primary);"></i>
+                <h4 style="margin-top: 16px;">Sécurisée</h4>
+                <p style="color: var(--gray-600);">Cryptographie avancée</p>
+            </div>
+            <div style="text-align: center;">
+                <i class="fas fa-gavel" style="font-size: 40px; color: var(--primary);"></i>
+                <h4 style="margin-top: 16px;">Valeur légale</h4>
+                <p style="color: var(--gray-600);">Conforme à la réglementation</p>
+            </div>
+            <div style="text-align: center;">
+                <i class="fas fa-clock" style="font-size: 40px; color: var(--primary);"></i>
+                <h4 style="margin-top: 16px;">Horodatée</h4>
+                <p style="color: var(--gray-600);">Preuve de signature</p>
+            </div>
+            <div style="text-align: center;">
+                <i class="fas fa-mobile-alt" style="font-size: 40px; color: var(--primary);"></i>
+                <h4 style="margin-top: 16px;">Mobile</h4>
+                <p style="color: var(--gray-600);">Signez depuis votre téléphone</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Plateforme Municipale</h3>
+                <p>Votre mairie en ligne, accessible 24h/24</p>
+            </div>
+            <div class="footer-section">
+                <h4>Liens utiles</h4>
+                <ul>
+                    <li><a href="#">Mentions légales</a></li>
+                    <li><a href="#">Politique de confidentialité</a></li>
+                    <li><a href="#">CGU</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Suivez-nous</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Plateforme Municipale - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script src="../../js/main.js"></script>
+    <script src="../../js/api.js"></script>
+    <script>
+        // Navigation mobile
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        if (navToggle) {
+            navToggle.addEventListener('click', () => {
+                navToggle.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+        }
+        
+        // Charger les informations du certificat
+        async function chargerCertificat() {
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/signature-electronique/certificats/mon_certificat/', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const certificat = await response.json();
+                    document.getElementById('certifStatut').textContent = 'Actif';
+                    document.getElementById('certifBadge').textContent = 'Valide';
+                    document.getElementById('certifBadge').className = 'status-badge status-valide';
+                    document.getElementById('validite').textContent = new Date(certificat.date_expiration).toLocaleDateString('fr-FR');
+                } else {
+                    document.getElementById('certifStatut').textContent = 'Inactif';
+                    document.getElementById('certifBadge').textContent = 'Certificat manquant';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+        
+        // Charger les dernières signatures
+        async function chargerDernieresSignatures() {
+            const token = localStorage.getItem('access_token');
+            if (!token) return;
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/signature-electronique/signatures/?page=1&page_size=3', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.results && data.results.length > 0) {
+                    const container = document.getElementById('recentSignatures');
+                    container.innerHTML = '';
+                    document.getElementById('signatureCount').textContent = data.count || data.results.length;
+                    
+                    data.results.forEach(sig => {
+                        const item = document.createElement('div');
+                        item.className = 'signature-item';
+                        item.innerHTML = `
+                            <div>
+                                <div style="font-weight: 600;">${sig.document_titre}</div>
+                                <div style="font-size: 12px; color: var(--gray-600);">${new Date(sig.timestamp_signature).toLocaleDateString('fr-FR')}</div>
+                            </div>
+                            <div>
+                                <span class="security-level level-1" style="margin-bottom: 0;">${sig.module_display}</span>
+                                <button class="btn-secondary" style="margin-left: 12px; padding: 6px 16px;" onclick="window.location.href='verifier.html?id=${sig.id}'">Voir</button>
+                            </div>
+                        `;
+                        container.appendChild(item);
+                    });
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+        
+        chargerCertificat();
+        chargerDernieresSignatures();
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon certificat - Signature électronique</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <link rel="stylesheet" href="../../css/modules/signature.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">[MENU]</nav>
+
+    <div class="signature-header">
+        <h1><i class="fas fa-certificate"></i> Mon certificat numérique</h1>
+        <p>Gérez votre identité numérique sécurisée</p>
+    </div>
+
+    <div class="form-container">
+        <div class="form-card">
+            <div id="certificatInfo" class="certificat-card">
+                <div class="loading-container"><div class="spinner"></div><p>Chargement...</p></div>
+            </div>
+
+            <div id="creerCertificatForm" style="display: none; margin-top: 24px;">
+                <div class="form-section-title"><i class="fas fa-plus-circle"></i> Créer mon certificat</div>
+                <div class="form-group">
+                    <label>Niveau de sécurité</label>
+                    <select id="niveauCertificat" class="filter-select">
+                        <option value="1">Niveau 1 - Signature simple</option>
+                        <option value="2">Niveau 2 - Signature avancée</option>
+                        <option value="3">Niveau 3 - Signature qualifiée</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe du certificat</label>
+                    <input type="password" id="motDePasseCertificat" class="search-input" placeholder="Minimum 8 caractères">
+                    <small>Ce mot de passe sera requis pour chaque signature</small>
+                </div>
+                <button class="btn-primary" onclick="creerCertificat()">Créer mon certificat</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/api.js"></script>
+    <script src="../../js/modules/signature.js"></script>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail de la structure - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .detail-container {
+            max-width: 1000px;
+            margin: 100px auto 2rem;
+            padding: 0 2rem;
+        }
+        .detail-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+        .detail-header {
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+        }
+        .detail-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .detail-header .placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 5rem;
+        }
+        .favori-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .favori-btn.active { color: #ef4444; }
+        .detail-content { padding: 2rem; }
+        .detail-title { font-size: 2rem; margin-bottom: 0.5rem; }
+        .detail-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: #f3f4f6;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .detail-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 16px;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .info-item i {
+            width: 30px;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+        .horaires-table {
+            width: 100%;
+            margin: 1rem 0;
+            border-collapse: collapse;
+        }
+        .horaires-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .horaires-table td:first-child { font-weight: 600; }
+        .contact-buttons {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        .contact-btn {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .contact-btn.tel { background: #10b981; color: white; }
+        .contact-btn.whatsapp { background: #25D366; color: white; }
+        .contact-btn.email { background: #3b82f6; color: white; }
+        .contact-btn.site { background: #6b7280; color: white; }
+        .contact-btn:hover { transform: translateY(-2px); }
+        .avis-section { margin-top: 2rem; }
+        .avis-card {
+            background: #f9fafb;
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .avis-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        .stars { color: #fbbf24; }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .loading-spinner { text-align: center; padding: 3rem; }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            color: white;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+        .toast-success { background: #10b981; }
+        .toast-error { background: #ef4444; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            .detail-container { padding: 0 1rem; }
+            .detail-title { font-size: 1.5rem; }
+            .contact-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-city"></i> Plateforme Municipale</div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/index.html">Actualités</a></li>
+                <li><a href="../activites/index.html">Activités</a></li>
+                <li><a href="index.html" class="active">Annuaire</a></li>
+                <li><a href="elus.html">Élus</a></li>
+                <li><a href="mes-favoris.html"><i class="fas fa-heart"></i> Favoris</a></li>
+                <li><a href="../accounts/profile.html"><i class="fas fa-user"></i> Mon compte</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="detail-container">
+        <div id="detail-content" class="detail-card">
+            <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/annuaires';
+        const token = localStorage.getItem('auth_token');
+        
+        if (!token) window.location.href = '../accounts/login.html';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const structureId = urlParams.get('id');
+        if (!structureId) window.location.href = 'index.html';
+        
+        let currentStructure = null;
+        let estFavori = false;
+        
+        async function loadStructure() {
+            try {
+                const response = await fetch(`${API_BASE}/structures/${structureId}/`);
+                currentStructure = await response.json();
+                estFavori = currentStructure.est_favori || false;
+                renderDetail();
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('detail-content').innerHTML = '<div class="error">Erreur de chargement</div>';
+            }
+        }
+        
+        function renderDetail() {
+            const s = currentStructure;
+            const container = document.getElementById('detail-content');
+            
+            container.innerHTML = `
+                <div class="detail-header">
+                    ${s.image_principale ? 
+                        `<img src="${s.image_principale}" alt="${escapeHtml(s.nom)}">` : 
+                        `<div class="placeholder"><i class="fas fa-building"></i></div>`
+                    }
+                    <button class="favori-btn ${estFavori ? 'active' : ''}" onclick="toggleFavori()">
+                        <i class="fas ${estFavori ? 'fa-heart' : 'fa-heart'}"></i>
+                    </button>
+                </div>
+                <div class="detail-content">
+                    <div class="detail-type">${getTypeIcon(s.type_structure)} ${getTypeLabel(s.type_structure)}</div>
+                    <h1 class="detail-title">${escapeHtml(s.nom)}</h1>
+                    
+                    <div class="detail-info-grid">
+                        <div class="info-item"><i class="fas fa-map-marker-alt"></i> <span>${escapeHtml(s.adresse)}<br>${s.quartier ? s.quartier+', ' : ''}${s.ville}</span></div>
+                        ${s.telephone ? `<div class="info-item"><i class="fas fa-phone"></i> <span>${s.telephone}</span></div>` : ''}
+                        ${s.email ? `<div class="info-item"><i class="fas fa-envelope"></i> <span>${s.email}</span></div>` : ''}
+                        <div class="info-item"><i class="fas fa-clock"></i> <span>${s.est_ouvert ? '🟢 Ouvert' : '🔴 Fermé'}</span></div>
+                    </div>
+                    
+                    <h3>Description</h3>
+                    <p>${s.description || 'Aucune description disponible.'}</p>
+                    
+                    <h3>Horaires d\'ouverture</h3>
+                    ${renderHoraires(s.horaires)}
+                    
+                    <div class="contact-buttons">
+                        ${s.telephone ? `<a href="tel:${s.telephone}" class="contact-btn tel"><i class="fas fa-phone"></i> Appeler</a>` : ''}
+                        ${s.whatsapp ? `<a href="https://wa.me/${s.whatsapp.replace(/[^0-9]/g, '')}" class="contact-btn whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : ''}
+                        ${s.email ? `<a href="mailto:${s.email}" class="contact-btn email"><i class="fas fa-envelope"></i> Envoyer un email</a>` : ''}
+                        ${s.site_web ? `<a href="${s.site_web}" class="contact-btn site" target="_blank"><i class="fas fa-globe"></i> Site web</a>` : ''}
+                    </div>
+                    
+                    <button class="btn-primary" onclick="contacter()"><i class="fas fa-paper-plane"></i> Contacter la structure</button>
+                    
+                    <div class="avis-section">
+                        <h3>Avis des citoyens</h3>
+                        <div id="avis-list">
+                            ${renderAvis(s.avis_recents)}
+                        </div>
+                        <button class="btn-primary" onclick="ajouterAvis()" style="margin-top: 1rem;"><i class="fas fa-star"></i> Donner mon avis</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderHoraires(horaires) {
+            if (!horaires || Object.keys(horaires).length === 0) {
+                return '<p>Horaires non renseignés</p>';
+            }
+            const jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+            let html = '<table class="horaires-table">';
+            jours.forEach(jour => {
+                if (horaires[jour]) {
+                    html += `<tr><td>${jour.charAt(0).toUpperCase() + jour.slice(1)}</td><td>${horaires[jour]}</td></tr>`;
+                }
+            });
+            html += '</table>';
+            return html;
+        }
+        
+        function renderAvis(avis) {
+            if (!avis || avis.length === 0) {
+                return '<p>Aucun avis pour le moment. Soyez le premier à donner votre avis !</p>';
+            }
+            return avis.map(a => `
+                <div class="avis-card">
+                    <div class="avis-header">
+                        <strong>${escapeHtml(a.utilisateur_nom || 'Anonyme')}</strong>
+                        <div class="stars">${'★'.repeat(a.note)}${'☆'.repeat(5-a.note)}</div>
+                    </div>
+                    <p>${escapeHtml(a.commentaire)}</p>
+                    <small>${new Date(a.date_creation).toLocaleDateString('fr-FR')}</small>
+                </div>
+            `).join('');
+        }
+        
+        async function toggleFavori() {
+            const method = estFavori ? 'retirer_favori' : 'ajouter_favori';
+            try {
+                const response = await fetch(`${API_BASE}/structures/${structureId}/${method}/`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    estFavori = !estFavori;
+                    const btn = document.querySelector('.favori-btn');
+                    if (btn) {
+                        btn.classList.toggle('active');
+                        btn.innerHTML = `<i class="fas ${estFavori ? 'fa-heart' : 'fa-heart'}"></i>`;
+                    }
+                    showToast(estFavori ? 'Ajouté aux favoris' : 'Retiré des favoris', 'success');
+                }
+            } catch (error) {
+                showToast('Erreur', 'error');
+            }
+        }
+        
+        function contacter() {
+            window.location.href = `contact.html?id=${structureId}`;
+        }
+        
+        function ajouterAvis() {
+            const note = prompt('Note (1-5) :', '5');
+            if (note && note >= 1 && note <= 5) {
+                const commentaire = prompt('Votre commentaire :');
+                if (commentaire) {
+                    ajouterAvisAPI(parseInt(note), commentaire);
+                }
+            }
+        }
+        
+        async function ajouterAvisAPI(note, commentaire) {
+            try {
+                const response = await fetch(`${API_BASE}/structures/${structureId}/ajouter_avis/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ note, commentaire })
+                });
+                if (response.ok) {
+                    showToast('Avis ajouté, en attente de modération', 'success');
+                    loadStructure();
+                } else {
+                    showToast('Erreur', 'error');
+                }
+            } catch (error) {
+                showToast('Erreur de connexion', 'error');
+            }
+        }
+        
+        function getTypeIcon(type) {
+            const icons = {mairie:'🏛️',ecole:'🏫',hopital:'🏥',marche:'🛒',police:'👮',transport:'🚌',culture:'🎭',sport:'⚽',social:'🤝',religion:'⛪',autre:'📌'};
+            return icons[type] || '📌';
+        }
+        
+        function getTypeLabel(type) {
+            const labels = {mairie:'Mairie',ecole:'École',hopital:'Hôpital',marche:'Marché',police:'Commissariat',transport:'Transport',culture:'Culture',sport:'Sport',social:'Social',religion:'Lieu de culte',autre:'Autre'};
+            return labels[type] || type;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        loadStructure();
+    </script>
+</body>
+</html>

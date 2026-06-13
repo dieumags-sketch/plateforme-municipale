@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent - État Civil | Commune Bot-Makak</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/modules/etat-civil.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">[MENU SIMILAIRE]</nav>
+
+    <div class="etat-civil-header">
+        <h1><i class="fas fa-user-check"></i> Agent - État Civil</h1>
+        <p>Traitement des demandes citoyennes</p>
+    </div>
+
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-section-title"><i class="fas fa-clock"></i> Demandes à traiter</div>
+            <div class="demandes-list" id="demandesList">
+                <div class="loading-container"><div class="spinner"></div><p>Chargement...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="traitementModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Vérification de la demande</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="../../../js/api.js"></script>
+    <script src="../../../js/modules/etat-civil-agent.js"></script>
+</body>
+</html>

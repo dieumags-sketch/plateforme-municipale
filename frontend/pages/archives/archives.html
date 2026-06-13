@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archives municipales - Commune Bot-Makak</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/archives.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="../static/images/logo.png" alt="Logo">
+                <h3>Bot-Makak</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
+                <a href="etat_civil.html"><i class="fas fa-file-alt"></i> État Civil</a>
+                <a href="actualites.html"><i class="fas fa-newspaper"></i> Actualités</a>
+                <a href="annuaires.html"><i class="fas fa-address-book"></i> Annuaire</a>
+                <a href="activites.html"><i class="fas fa-calendar-alt"></i> Activités</a>
+                <a href="signature.html"><i class="fas fa-signature"></i> Signatures</a>
+                <a href="paiements.html"><i class="fas fa-credit-card"></i> Paiements</a>
+                <a href="dechets.html"><i class="fas fa-trash-alt"></i> Déchets</a>
+                <a href="archives.html" class="active"><i class="fas fa-archive"></i> Archives</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1>Archives municipales</h1>
+                    <p>Consultez et demandez l'accès aux archives historiques</p>
+                </div>
+                <div class="user-info">
+                    <span id="userName">Chargement...</span>
+                    <img src="../static/images/avatar.png" alt="Avatar" class="avatar">
+                </div>
+            </header>
+            
+            <div class="archives-container">
+                <!-- Search Section -->
+                <div class="search-section">
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Rechercher par titre, référence, auteur, mots-clés...">
+                        <button id="searchBtn" class="search-btn"><i class="fas fa-search"></i> Rechercher</button>
+                    </div>
+                    <div class="filters-row">
+                        <select id="categorieFilter" class="filter-select">
+                            <option value="">Toutes les catégories</option>
+                        </select>
+                        <select id="anneeDebutFilter" class="filter-select">
+                            <option value="">Année début</option>
+                        </select>
+                        <select id="anneeFinFilter" class="filter-select">
+                            <option value="">Année fin</option>
+                        </select>
+                        <select id="accesFilter" class="filter-select">
+                            <option value="">Niveau d'accès</option>
+                            <option value="public">Public</option>
+                            <option value="restreint">Restreint</option>
+                            <option value="confidentiel">Confidentiel</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="recherche"><i class="fas fa-search"></i> Recherche</button>
+                    <button class="tab-btn" data-tab="mes-demandes"><i class="fas fa-list-alt"></i> Mes demandes</button>
+                </div>
+                
+                <!-- Recherche Tab -->
+                <div id="rechercheTab" class="tab-content active">
+                    <div class="archives-grid" id="archivesGrid">
+                        <div class="loading-container"><div class="spinner"></div></div>
+                    </div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+                
+                <!-- Mes Demandes Tab -->
+                <div id="mesDemandesTab" class="tab-content">
+                    <div class="demandes-list" id="demandesList">
+                        <div class="loading-container"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal Détail Archive -->
+    <div id="archiveModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Détail de l'archive</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenu dynamique -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Demande d'accès -->
+    <div id="demandeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Demande d'accès</h2>
+                <button class="modal-close" onclick="closeDemandeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="demandeModalBody">
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/api.js"></script>
+    <script src="../js/archives.js"></script>
+</body>
+</html>

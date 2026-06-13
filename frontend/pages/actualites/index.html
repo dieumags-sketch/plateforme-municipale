@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Actualités - Commune Bot-Makak</title>
+    
+    <!-- Styles globaux -->
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+        
+        /* Header actualités */
+        .actualites-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 60px 0;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .actualites-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .actualites-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, 20px); }
+        }
+        
+        .actualites-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .actualites-header h1 i {
+            margin-right: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 60px;
+        }
+        
+        .actualites-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Stats rapides */
+        .quick-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: -30px 24px 40px;
+            position: relative;
+            z-index: 10;
+            flex-wrap: wrap;
+        }
+        
+        .stat-badge {
+            background: white;
+            padding: 16px 28px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+        }
+        
+        .stat-badge:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .stat-badge i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+        
+        .stat-badge .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+        
+        .stat-badge .stat-label {
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+        
+        /* Section contenant les articles */
+        .actes-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+        }
+        
+        /* Filtres */
+        .filters-section {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid var(--gray-200);
+            border-radius: 40px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 180px;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .search-wrapper {
+            display: flex;
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid var(--gray-200);
+            border-radius: 40px 0 0 40px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn-search {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 0 24px;
+            border-radius: 0 40px 40px 0;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-search:hover {
+            opacity: 0.9;
+        }
+        
+        /* Grille des articles */
+        .actualites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        /* Carte article */
+        .article-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .article-image {
+            height: 220px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .article-category {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .article-content {
+            padding: 20px;
+        }
+        
+        .article-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--gray-800);
+            line-height: 1.4;
+        }
+        
+        .article-excerpt {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--gray-500);
+            padding-top: 12px;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .article-stats {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .article-stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        .pagination button {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--gray-200);
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .pagination button.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Loading */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: var(--gray-600);
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 24px 24px 0 0;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: white;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .modal-close:hover {
+            opacity: 1;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-image {
+            width: 100%;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--gray-600);
+        }
+        
+        .comment-section {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .comment-input {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .comment-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: 40px;
+            font-size: 14px;
+        }
+        
+        .comment-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .comment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .comment-item {
+            background: var(--gray-100);
+            padding: 12px 16px;
+            border-radius: 16px;
+        }
+        
+        .comment-author {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        
+        .comment-text {
+            font-size: 13px;
+            color: var(--gray-600);
+        }
+        
+        @media (max-width: 768px) {
+            .actualites-header h1 { font-size: 2rem; }
+            .quick-stats { flex-direction: column; align-items: center; }
+            .stat-badge { width: 80%; justify-content: center; }
+            .filter-group { flex-direction: column; align-items: stretch; }
+            .search-wrapper { width: 100%; }
+            .actualites-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation identique à l'accueil -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-city"></i>
+                <span>Plateforme Municipale</span>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="#" class="active">Actualités</a></li>
+                <li><a href="../annuaires/">Annuaires</a></li>
+                <li><a href="../dechets/">Gestion des déchets</a></li>
+                <li><a href="../activites/">Activités</a></li>
+                <li><a href="../accounts/login.html" class="btn-login"><i class="fas fa-user"></i> Connexion</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header Actualités -->
+    <div class="actualites-header">
+        <h1><i class="fas fa-newspaper"></i> Actualités municipales</h1>
+        <p>Restez informés des dernières nouvelles de votre commune</p>
+    </div>
+
+    <!-- Stats rapides -->
+    <div class="quick-stats">
+        <div class="stat-badge">
+            <i class="fas fa-newspaper"></i>
+            <div>
+                <div class="stat-number" id="totalArticles">0</div>
+                <div class="stat-label">Articles publiés</div>
+            </div>
+        </div>
+        <div class="stat-badge">
+            <i class="fas fa-eye"></i>
+            <div>
+                <div class="stat-number" id="totalVues">0</div>
+                <div class="stat-label">Vues totales</div>
+            </div>
+        </div>
+        <div class="stat-badge">
+            <i class="fas fa-comment"></i>
+            <div>
+                <div class="stat-number" id="totalCommentaires">0</div>
+                <div class="stat-label">Commentaires</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres et articles -->
+    <div class="actes-section">
+        <div class="filters-section">
+            <div class="filter-group">
+                <select id="categorie-filter" class="filter-select">
+                    <option value="">📁 Toutes les catégories</option>
+                    <option value="mairie">🏛️ Vie municipale</option>
+                    <option value="sante">🏥 Santé</option>
+                    <option value="education">📚 Éducation</option>
+                    <option value="culture">🎭 Culture</option>
+                    <option value="sport">⚽ Sport</option>
+                    <option value="social">🤝 Social</option>
+                </select>
+                
+                <div class="search-wrapper">
+                    <input type="text" id="search-input" class="search-input" placeholder="🔍 Rechercher un article...">
+                    <button id="search-btn" class="btn-search"><i class="fas fa-search"></i></button>
+                </div>
+                
+                <select id="order-select" class="filter-select">
+                    <option value="-date_publication">📅 Plus récent</option>
+                    <option value="date_publication">📅 Plus ancien</option>
+                    <option value="-vue_count">👁️ Plus consulté</option>
+                    <option value="-like_count">❤️ Plus aimé</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="actualites-grid" class="actualites-grid">
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Chargement des actualités...</p>
+            </div>
+        </div>
+        
+        <div id="pagination" class="pagination"></div>
+    </div>
+
+    <!-- Modal détail article -->
+    <div id="articleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Détail de l'article</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="loading-container"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Plateforme Municipale</h3>
+                <p>Votre mairie en ligne, accessible 24h/24</p>
+            </div>
+            <div class="footer-section">
+                <h4>Liens utiles</h4>
+                <ul>
+                    <li><a href="#">Mentions légales</a></li>
+                    <li><a href="#">Politique de confidentialité</a></li>
+                    <li><a href="#">CGU</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Suivez-nous</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Plateforme Municipale - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script src="../../js/main.js"></script>
+    <script src="../../js/api.js"></script>
+    <script>
+        // Navigation mobile
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        if (navToggle) {
+            navToggle.addEventListener('click', () => {
+                navToggle.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+        }
+        
+        // Configuration
+        const API_BASE_URL = 'http://localhost:8000/api';
+        let currentPage = 1;
+        let currentFilters = {};
+        let totalPages = 1;
+        
+        // Éléments DOM
+        const articlesGrid = document.getElementById('actualites-grid');
+        const paginationDiv = document.getElementById('pagination');
+        const categorieFilter = document.getElementById('categorie-filter');
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const orderSelect = document.getElementById('order-select');
+        
+        // Chargement des articles
+        async function loadArticles() {
+            if (!articlesGrid) return;
+            
+            articlesGrid.innerHTML = '<div class="loading-container"><div class="spinner"></div><p>Chargement des actualités...</p></div>';
+            
+            try {
+                let url = `${API_BASE_URL}/actualites/publications/?page=${currentPage}&page_size=9`;
+                if (currentFilters.categorie && currentFilters.categorie !== '') url += `&categorie=${currentFilters.categorie}`;
+                if (currentFilters.search) url += `&search=${encodeURIComponent(currentFilters.search)}`;
+                if (currentFilters.order) url += `&ordering=${currentFilters.order}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.results && data.results.length > 0) {
+                    displayArticles(data.results);
+                    displayPagination(data.count);
+                    updateStats(data);
+                } else {
+                    articlesGrid.innerHTML = '<div class="empty-state"><i class="fas fa-newspaper"></i><p>Aucun article trouvé</p></div>';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                articlesGrid.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erreur de chargement</p></div>';
+            }
+        }
+        
+        function displayArticles(articles) {
+            articlesGrid.innerHTML = '';
+            
+            articles.forEach(article => {
+                const card = document.createElement('div');
+                card.className = 'article-card';
+                card.onclick = () => showArticleDetail(article.id);
+                
+                const categoryColor = getCategoryColor(article.categorie);
+                const date = new Date(article.date_publication).toLocaleDateString('fr-FR');
+                
+                card.innerHTML = `
+                    <div class="article-image" style="background-image: url('${article.image || 'https://placehold.co/400x220/667eea/white?text=Actualité'}')">
+                        <span class="article-category" style="background: ${categoryColor}">${article.categorie_nom || 'Actualité'}</span>
+                    </div>
+                    <div class="article-content">
+                        <h3 class="article-title">${escapeHtml(article.titre)}</h3>
+                        <p class="article-excerpt">${escapeHtml(article.accroche || article.contenu?.substring(0, 120) || '')}...</p>
+                        <div class="article-meta">
+                            <span><i class="far fa-calendar-alt"></i> ${date}</span>
+                            <div class="article-stats">
+                                <span><i class="far fa-eye"></i> ${article.vues || 0}</span>
+                                <span><i class="far fa-heart"></i> ${article.likes || 0}</span>
+                                <span><i class="far fa-comment"></i> ${article.commentaires_count || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                articlesGrid.appendChild(card);
+            });
+        }
+        
+        function displayPagination(total) {
+            const perPage = 9;
+            totalPages = Math.ceil(total / perPage);
+            
+            if (totalPages <= 1) {
+                paginationDiv.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            html += `<button class="page-prev" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">&laquo;</button>`;
+            
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+            
+            if (startPage > 1) {
+                html += `<button onclick="goToPage(1)">1</button>`;
+                if (startPage > 2) html += `<span class="pagination-dots">...</span>`;
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) html += `<span class="pagination-dots">...</span>`;
+                html += `<button onclick="goToPage(${totalPages})">${totalPages}</button>`;
+            }
+            
+            html += `<button class="page-next" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">&raquo;</button>`;
+            paginationDiv.innerHTML = html;
+        }
+        
+        function updateStats(data) {
+            const totalArticlesSpan = document.getElementById('totalArticles');
+            if (totalArticlesSpan) totalArticlesSpan.textContent = data.count || 0;
+        }
+        
+        function getCategoryColor(categorie) {
+            const colors = {
+                'mairie': '#667eea',
+                'sante': '#10b981',
+                'education': '#3b82f6',
+                'culture': '#f59e0b',
+                'sport': '#ef4444',
+                'social': '#8b5cf6'
+            };
+            return colors[categorie] || '#667eea';
+        }
+        
+        async function showArticleDetail(articleId) {
+            const modal = document.getElementById('articleModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalBody.innerHTML = '<div class="loading-container"><div class="spinner"></div><p>Chargement...</p></div>';
+            modal.classList.add('active');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/actualites/publications/${articleId}/`);
+                const article = await response.json();
+                
+                modalBody.innerHTML = `
+                    ${article.image ? `<img src="${article.image}" class="modal-image" alt="${article.titre}">` : ''}
+                    <div class="modal-meta">
+                        <span><i class="far fa-calendar-alt"></i> ${new Date(article.date_publication).toLocaleDateString('fr-FR')}</span>
+                        <span><i class="far fa-user"></i> ${article.auteur_nom || 'Administration'}</span>
+                        <span><i class="far fa-eye"></i> ${article.vues || 0} vues</span>
+                    </div>
+                    <h2 style="margin-bottom: 16px;">${escapeHtml(article.titre)}</h2>
+                    <div style="line-height: 1.6; margin-bottom: 24px;">${article.contenu || article.description || ''}</div>
+                    
+                    <div class="comment-section">
+                        <h4>💬 Commentaires (${article.commentaires?.length || 0})</h4>
+                        <div class="comment-input">
+                            <input type="text" id="commentInput" placeholder="Écrire un commentaire...">
+                            <button class="btn-primary" onclick="posterCommentaire('${article.id}')">Envoyer</button>
+                        </div>
+                        <div class="comment-list" id="commentList">
+                            ${article.commentaires?.map(c => `
+                                <div class="comment-item">
+                                    <div class="comment-author">${c.utilisateur_nom || 'Citoyen'}</div>
+                                    <div class="comment-text">${escapeHtml(c.contenu)}</div>
+                                </div>
+                            `).join('') || '<p>Aucun commentaire</p>'}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                modalBody.innerHTML = '<div class="empty-state">Erreur de chargement</div>';
+            }
+        }
+        
+        async function posterCommentaire(articleId) {
+            const commentInput = document.getElementById('commentInput');
+            const contenu = commentInput?.value;
+            
+            if (!contenu) {
+                alert('Veuillez écrire un commentaire');
+                return;
+            }
+            
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                alert('Veuillez vous connecter pour commenter');
+                window.location.href = '../accounts/login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/actualites/publications/${articleId}/commenter/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ contenu: contenu })
+                });
+                
+                if (response.ok) {
+                    alert('Commentaire ajouté !');
+                    commentInput.value = '';
+                    showArticleDetail(articleId);
+                } else {
+                    alert('Erreur lors de l\'ajout du commentaire');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur de connexion');
+            }
+        }
+        
+        function goToPage(page) {
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            loadArticles();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function applyFilters() {
+            currentFilters = {
+                categorie: categorieFilter?.value || '',
+                search: searchInput?.value || '',
+                order: orderSelect?.value || '-date_publication'
+            };
+            currentPage = 1;
+            loadArticles();
+        }
+        
+        // Événements
+        searchBtn?.addEventListener('click', applyFilters);
+        searchInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') applyFilters(); });
+        categorieFilter?.addEventListener('change', applyFilters);
+        orderSelect?.addEventListener('change', applyFilters);
+        
+        function closeModal() {
+            document.getElementById('articleModal').classList.remove('active');
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Initialisation
+        loadArticles();
+        
+        window.goToPage = goToPage;
+        window.closeModal = closeModal;
+        window.posterCommentaire = posterCommentaire;
+    </script>
+</body>
+</html>

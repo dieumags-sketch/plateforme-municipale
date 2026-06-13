@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord Agent - Bot-Makak</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <!-- En-tête -->
+    <nav class="bg-blue-800 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-user-shield text-2xl"></i>
+                <h1 class="text-xl font-bold">Tableau de bord Agent</h1>
+                <span class="text-sm" id="agent-name">Chargement...</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <i class="fas fa-bell text-xl cursor-pointer" onclick="toggleNotifications()"></i>
+                    <span id="notif-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1 hidden">0</span>
+                </div>
+                <a href="/admin/logout/" class="hover:text-gray-300">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-6">
+        <!-- Cartes de synthèse -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500 text-sm">Tâches en attente</p>
+                        <p class="text-3xl font-bold" id="taches-attente">0</p>
+                    </div>
+                    <i class="fas fa-tasks text-4xl text-yellow-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500 text-sm">Signalements urgents</p>
+                        <p class="text-3xl font-bold" id="signalements-urgents">0</p>
+                    </div>
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500 text-sm">Tâches terminées (mois)</p>
+                        <p class="text-3xl font-bold" id="taches-terminees">0</p>
+                    </div>
+                    <i class="fas fa-check-circle text-4xl text-green-500"></i>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500 text-sm">Taux de réalisation</p>
+                        <p class="text-3xl font-bold" id="taux-realisation">0%</p>
+                    </div>
+                    <i class="fas fa-chart-line text-4xl text-blue-500"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deux colonnes -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Tâches prioritaires -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-clock text-orange-500 mr-2"></i>
+                    Prochaines échéances
+                </h2>
+                <div id="prochaines-echeances" class="space-y-3">
+                    <p class="text-gray-500 text-center">Chargement...</p>
+                </div>
+            </div>
+
+            <!-- Performance -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-chart-pie text-green-500 mr-2"></i>
+                    Performance
+                </h2>
+                <canvas id="performanceChart" height="200"></canvas>
+                <div class="mt-4 text-center">
+                    <p class="text-gray-600">Tâches réalisées dans les délais</p>
+                    <p class="text-2xl font-bold text-green-600" id="taux-delais">0%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signalements récents -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-trash-alt text-red-500 mr-2"></i>
+                Derniers signalements traités
+            </h2>
+            <div id="derniers-signalements" class="overflow-x-auto">
+                <p class="text-gray-500 text-center">Chargement...</p>
+            </div>
+        </div>
+
+        <!-- Liste des tâches -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center justify-between">
+                <span><i class="fas fa-list-check text-blue-500 mr-2"></i>Mes tâches</span>
+                <div class="flex space-x-2">
+                    <select id="filtre-statut" class="border rounded px-3 py-1 text-sm">
+                        <option value="en_attente">En attente</option>
+                        <option value="en_cours">En cours</option>
+                        <option value="terminee">Terminées</option>
+                        <option value="all">Toutes</option>
+                    </select>
+                    <select id="filtre-type" class="border rounded px-3 py-1 text-sm">
+                        <option value="">Tous types</option>
+                        <option value="etat_civil">État Civil</option>
+                        <option value="dechets">Déchets</option>
+                        <option value="archives">Archives</option>
+                        <option value="paiements">Paiements</option>
+                    </select>
+                </div>
+            </h2>
+            <div id="liste-taches" class="space-y-3">
+                <p class="text-gray-500 text-center">Chargement...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL pour les appels API
+        const BASE_URL = '/api/dashboard-agent/';
+        
+        let performanceChart = null;
+
+        async function chargerDonnees() {
+            try {
+                const response = await fetch(BASE_URL + 'api/stats/');
+                const data = await response.json();
+                
+                document.getElementById('agent-name').textContent = data.agent.nom;
+                document.getElementById('taches-attente').textContent = data.taches.en_attente;
+                document.getElementById('signalements-urgents').textContent = data.dechets.signalements_urgents || 0;
+                document.getElementById('taches-terminees').textContent = data.taches.terminees;
+                document.getElementById('taux-realisation').textContent = data.performance.taux_realisation + '%';
+                document.getElementById('taux-delais').textContent = data.performance.taux_delais + '%';
+                
+                const notifCount = data.notifications.non_lues;
+                const badge = document.getElementById('notif-badge');
+                if (notifCount > 0) {
+                    badge.textContent = notifCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+                
+                const echeancesDiv = document.getElementById('prochaines-echeances');
+                if (data.taches.prochaines_echeances && data.taches.prochaines_echeances.length > 0) {
+                    echeancesDiv.innerHTML = data.taches.prochaines_echeances.map(tache => `
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-medium ${tache.priorite === 'haute' ? 'text-red-600' : 'text-gray-700'}">
+                                    ${tache.titre}
+                                </p>
+                                <p class="text-sm text-gray-500">${tache.type_display || tache.type_tache}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm ${new Date(tache.date_echeance) < new Date() ? 'text-red-500' : 'text-green-600'}">
+                                    <i class="fas fa-calendar-alt mr-1"></i>${tache.date_echeance_formatee}
+                                </p>
+                                <span class="text-xs px-2 py-1 rounded ${tache.priorite === 'haute' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">
+                                    ${tache.priorite === 'haute' ? 'Urgent' : 'Normal'}
+                                </span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    echeancesDiv.innerHTML = '<p class="text-gray-500 text-center">Aucune tâche en attente</p>';
+                }
+                
+                const signalementsDiv = document.getElementById('derniers-signalements');
+                if (data.dechets.derniers_signalements && data.dechets.derniers_signalements.length > 0) {
+                    signalementsDiv.innerHTML = `
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Type</th>
+                                    <th class="px-4 py-2 text-left">Statut</th>
+                                    <th class="px-4 py-2 text-left">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.dechets.derniers_signalements.map(s => `
+                                    <tr class="border-t">
+                                        <td class="px-4 py-2">${s.type_signalement}</td>
+                                        <td class="px-4 py-2">
+                                            <span class="px-2 py-1 rounded text-xs ${s.statut === 'traite' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                                                ${s.statut}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-2">${new Date(s.date_signalement).toLocaleDateString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                } else {
+                    signalementsDiv.innerHTML = '<p class="text-gray-500 text-center">Aucun signalement récent</p>';
+                }
+                
+                if (performanceChart) performanceChart.destroy();
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+                performanceChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Terminées', 'En attente', 'En cours'],
+                        datasets: [{
+                            data: [data.taches.terminees, data.taches.en_attente, data.taches.en_cours],
+                            backgroundColor: ['#10b981', '#f59e0b', '#3b82f6']
+                        }]
+                    }
+                });
+                
+                chargerTaches();
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+        
+        async function chargerTaches() {
+            const statut = document.getElementById('filtre-statut').value;
+            const type = document.getElementById('filtre-type').value;
+            let url = BASE_URL + `api/taches/?statut=${statut}`;
+            if (type) url += `&type=${type}`;
+            
+            try {
+                const response = await fetch(url);
+                const taches = await response.json();
+                const container = document.getElementById('liste-taches');
+                
+                if (taches.length > 0) {
+                    container.innerHTML = taches.map(tache => `
+                        <div class="flex justify-between items-center p-4 border rounded-lg hover:shadow-md transition">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2 h-2 rounded-full ${tache.priorite === 'haute' ? 'bg-red-500' : (tache.priorite === 'moyenne' ? 'bg-orange-500' : 'bg-green-500')}"></span>
+                                    <h3 class="font-medium">${tache.titre}</h3>
+                                    <span class="text-xs px-2 py-1 rounded bg-gray-200">${tache.type_display || tache.type_tache}</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-1">${tache.description}</p>
+                            </div>
+                            <div class="text-right ml-4">
+                                <p class="text-xs text-gray-500">Échéance</p>
+                                <p class="text-sm font-medium ${new Date(tache.date_echeance) < new Date() ? 'text-red-500' : ''}">${tache.date_echeance_formatee}</p>
+                                <div class="mt-2 flex space-x-2">
+                                    ${tache.statut === 'en_attente' ? `<button onclick="demarrerTache(${tache.id})" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">Démarrer</button>` : ''}
+                                    ${tache.statut === 'en_cours' ? `<button onclick="terminerTache(${tache.id})" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">Terminer</button>` : ''}
+                                    ${tache.statut !== 'terminee' ? `<button onclick="annulerTache(${tache.id})" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">Annuler</button>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-8">Aucune tâche trouvée</p>';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+        
+        async function demarrerTache(id) {
+            await fetch(BASE_URL + `api/taches/${id}/`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'demarrer'})
+            });
+            chargerDonnees();
+        }
+        
+        async function terminerTache(id) {
+            const commentaire = prompt('Ajoutez un commentaire (optionnel) :');
+            await fetch(BASE_URL + `api/taches/${id}/`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({action: 'terminer', commentaire: commentaire || ''})
+            });
+            chargerDonnees();
+        }
+        
+        async function annulerTache(id) {
+            if (confirm('Annuler cette tâche ?')) {
+                await fetch(BASE_URL + `api/taches/${id}/`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({action: 'annuler'})
+                });
+                chargerDonnees();
+            }
+        }
+        
+        function toggleNotifications() {
+            alert('Fonctionnalité à venir');
+        }
+        
+        document.getElementById('filtre-statut').addEventListener('change', chargerTaches);
+        document.getElementById('filtre-type').addEventListener('change', chargerTaches);
+        
+        chargerDonnees();
+        setInterval(chargerDonnees, 30000);
+    </script>
+</body>
+</html>

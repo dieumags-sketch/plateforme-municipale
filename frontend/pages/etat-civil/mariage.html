@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Déclaration de mariage - Commune Bot-Makak</title>
+    
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+        
+        .etat-civil-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 60px 0;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .etat-civil-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .etat-civil-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, 20px); }
+        }
+        
+        .etat-civil-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .etat-civil-header h1 i {
+            margin-right: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 60px;
+        }
+        
+        .etat-civil-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .form-container {
+            max-width: 1200px;
+            margin: -30px auto 0;
+            padding: 0 24px 60px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 48px;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 24px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gray-200);
+            z-index: 1;
+        }
+        
+        .step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+            min-width: 80px;
+        }
+        
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border: 2px solid var(--gray-300);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-number {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .step.completed .step-number {
+            background: var(--success);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .step.completed .step-number i {
+            font-size: 20px;
+        }
+        
+        .step-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+        
+        .step.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .form-step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .form-step.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 28px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .form-section-title i {
+            font-size: 1.4rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+        
+        .form-group label .required {
+            color: var(--danger);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 14px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        
+        .form-group input.error,
+        .form-group select.error {
+            border-color: var(--danger);
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 12px;
+            background: var(--gray-100);
+            border-radius: 14px;
+            margin-top: 16px;
+        }
+        
+        .checkbox-label input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .btn-prev, .btn-next, .btn-submit {
+            padding: 14px 32px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .btn-prev {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+        
+        .btn-prev:hover {
+            background: var(--gray-300);
+            transform: translateX(-2px);
+        }
+        
+        .btn-next, .btn-submit {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-next:hover, .btn-submit:hover {
+            transform: translateX(2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .recapitulatif {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .recap-section {
+            background: var(--gray-100);
+            padding: 20px;
+            border-radius: 20px;
+        }
+        
+        .recap-section h4 {
+            color: var(--primary);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--gray-300);
+        }
+        
+        .recap-section p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+            padding: 20px;
+            border-radius: 20px;
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        
+        .info-box i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+        
+        @media (max-width: 768px) {
+            .etat-civil-header h1 { font-size: 2rem; }
+            .form-container { padding: 0 16px 40px; }
+            .form-card { padding: 24px; }
+            .stepper { flex-wrap: wrap; justify-content: center; }
+            .stepper::before { display: none; }
+            .step { min-width: 70px; }
+            .form-section-title { font-size: 1.1rem; }
+            .form-row { grid-template-columns: 1fr; gap: 16px; }
+            .form-navigation { flex-direction: column; }
+            .btn-prev, .btn-next, .btn-submit { width: 100%; text-align: center; }
+            .recapitulatif { grid-template-columns: 1fr; }
+            .info-box { flex-direction: column; text-align: center; }
+        }
+        
+        @media (max-width: 480px) {
+            .step-label { font-size: 10px; }
+            .step-number { width: 40px; height: 40px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-city"></i><span>Plateforme Municipale</span></div>
+            <div class="nav-toggle" id="navToggle"><i class="fas fa-bars"></i></div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/">Actualités</a></li>
+                <li><a href="../annuaires/">Annuaires</a></li>
+                <li><a href="../dechets/">Déchets</a></li>
+                <li><a href="../activites/">Activités</a></li>
+                <li><a href="../accounts/login.html" class="btn-login"><i class="fas fa-user"></i> Connexion</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="etat-civil-header">
+        <h1><i class="fas fa-ring"></i> Déclaration de mariage</h1>
+        <p>Formulaire de déclaration de mariage</p>
+    </div>
+
+    <div class="form-container">
+        <div class="form-card">
+            <div class="stepper">
+                <div class="step active" data-step="1"><div class="step-number">1</div><div class="step-label">👨 Époux</div></div>
+                <div class="step" data-step="2"><div class="step-number">2</div><div class="step-label">👰 Épouse</div></div>
+                <div class="step" data-step="3"><div class="step-number">3</div><div class="step-label">👥 Témoins</div></div>
+                <div class="step" data-step="4"><div class="step-number">4</div><div class="step-label">💒 Mariage</div></div>
+                <div class="step" data-step="5"><div class="step-number">5</div><div class="step-label">✅ Récap</div></div>
+            </div>
+
+            <form id="mariageForm">
+                <div id="step1" class="form-step active">
+                    <div class="form-section-title"><i class="fas fa-male"></i> Informations de l'époux</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Nom <span class="required">*</span></label><input type="text" id="epouxNom" required></div>
+                        <div class="form-group"><label>Prénom(s) <span class="required">*</span></label><input type="text" id="epouxPrenom" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Date de naissance <span class="required">*</span></label><input type="date" id="epouxDateNaissance" required></div>
+                        <div class="form-group"><label>Lieu de naissance <span class="required">*</span></label><input type="text" id="epouxLieuNaissance" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Domicile</label><input type="text" id="epouxDomicile"></div>
+                        <div class="form-group"><label>Profession</label><input type="text" id="epouxProfession"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Téléphone</label><input type="tel" id="epouxTelephone" placeholder="6XXXXXXXX"></div>
+                        <div class="form-group"><label>Nationalité</label><input type="text" id="epouxNationalite" value="Camerounaise"></div>
+                    </div>
+                </div>
+
+                <div id="step2" class="form-step">
+                    <div class="form-section-title"><i class="fas fa-female"></i> Informations de l'épouse</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Nom <span class="required">*</span></label><input type="text" id="epouseNom" required></div>
+                        <div class="form-group"><label>Prénom(s) <span class="required">*</span></label><input type="text" id="epousePrenom" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Date de naissance <span class="required">*</span></label><input type="date" id="epouseDateNaissance" required></div>
+                        <div class="form-group"><label>Lieu de naissance <span class="required">*</span></label><input type="text" id="epouseLieuNaissance" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Domicile</label><input type="text" id="epouseDomicile"></div>
+                        <div class="form-group"><label>Profession</label><input type="text" id="epouseProfession"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Téléphone</label><input type="tel" id="epouseTelephone" placeholder="6XXXXXXXX"></div>
+                        <div class="form-group"><label>Nationalité</label><input type="text" id="epouseNationalite" value="Camerounaise"></div>
+                    </div>
+                </div>
+
+                <div id="step3" class="form-step">
+                    <div class="form-section-title"><i class="fas fa-user-friends"></i> Témoins</div>
+                    <div id="temoins-container">
+                        <div class="temoins-group">
+                            <h4>Témoin 1</h4>
+                            <div class="form-row">
+                                <div class="form-group"><label>Nom <span class="required">*</span></label><input type="text" class="temoin1Nom" required></div>
+                                <div class="form-group"><label>Prénom <span class="required">*</span></label><input type="text" class="temoin1Prenom" required></div>
+                            </div>
+                        </div>
+                        <div class="temoins-group">
+                            <h4>Témoin 2</h4>
+                            <div class="form-row">
+                                <div class="form-group"><label>Nom <span class="required">*</span></label><input type="text" class="temoin2Nom" required></div>
+                                <div class="form-group"><label>Prénom <span class="required">*</span></label><input type="text" class="temoin2Prenom" required></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-add" onclick="ajouterTemoin()"><i class="fas fa-plus"></i> Ajouter un témoin</button>
+                </div>
+
+                <div id="step4" class="form-step">
+                    <div class="form-section-title"><i class="fas fa-calendar-alt"></i> Informations du mariage</div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Date de célébration <span class="required">*</span></label><input type="date" id="dateMariage" required></div>
+                        <div class="form-group"><label>Lieu de célébration <span class="required">*</span></label><input type="text" id="lieuMariage" required></div>
+                    </div>
+                    <div class="form-group"><label>Régime matrimonial</label>
+                        <select id="regimeMatrimonial">
+                            <option value="communautaire">Communauté de biens</option>
+                            <option value="separation">Séparation de biens</option>
+                            <option value="participation">Participation aux acquêts</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-label"><input type="checkbox" id="consentementEpoux" required> Consentement de l'époux</div>
+                    <div class="checkbox-label"><input type="checkbox" id="consentementEpouse" required> Consentement de l'épouse</div>
+                </div>
+
+                <div id="step5" class="form-step">
+                    <div class="form-section-title"><i class="fas fa-check-circle"></i> Récapitulatif</div>
+                    <div id="recapitulatif" class="recapitulatif"></div>
+                    <div class="info-box"><i class="fas fa-info-circle"></i><div><strong>💰 Tarif :</strong> 5 000 FCFA</div></div>
+                </div>
+
+                <div class="form-navigation">
+                    <button type="button" class="btn-prev" id="prevBtn" style="display:none">◀ Précédent</button>
+                    <button type="button" class="btn-next" id="nextBtn">Suivant ▶</button>
+                    <button type="submit" class="btn-submit" id="submitBtn" style="display:none">📤 Soumettre</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section"><h3>Plateforme Municipale</h3><p>Votre mairie en ligne, accessible 24h/24</p></div>
+            <div class="footer-section"><h4>Liens utiles</h4><ul><li><a href="#">Mentions légales</a></li><li><a href="#">Politique de confidentialité</a></li><li><a href="#">CGU</a></li><li><a href="#">Contact</a></li></ul></div>
+            <div class="footer-section"><h4>Suivez-nous</h4><div class="social-links"><a href="#"><i class="fab fa-facebook"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-linkedin"></i></a><a href="#"><i class="fab fa-instagram"></i></a></div></div>
+        </div>
+        <div class="footer-bottom"><p>&copy; 2024 Plateforme Municipale - Tous droits réservés</p></div>
+    </footer>
+
+    <script src="../../js/main.js"></script>
+    <script src="../../js/api.js"></script>
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+        
+        function showStep(step) {
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+                document.querySelector(`.step[data-step="${i}"]`).classList.remove('active');
+            }
+            document.getElementById(`step${step}`).classList.add('active');
+            document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+            document.getElementById('prevBtn').style.display = step === 1 ? 'none' : 'flex';
+            document.getElementById('nextBtn').style.display = step === totalSteps ? 'none' : 'flex';
+            document.getElementById('submitBtn').style.display = step === totalSteps ? 'flex' : 'none';
+            if (step === totalSteps) updateRecap();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            currentStep = step;
+        }
+        
+        function validateStep(step) {
+            const required = { 1: ['epouxNom', 'epouxPrenom', 'epouxDateNaissance', 'epouxLieuNaissance'], 2: ['epouseNom', 'epousePrenom', 'epouseDateNaissance', 'epouseLieuNaissance'], 3: ['temoin1Nom', 'temoin1Prenom', 'temoin2Nom', 'temoin2Prenom'], 4: ['dateMariage', 'lieuMariage'] };
+            let valid = true;
+            if (required[step]) required[step].forEach(id => { const el = document.getElementById(id); if (!el.value) { el.classList.add('error'); valid = false; } else { el.classList.remove('error'); } });
+            if (step === 4 && (!document.getElementById('consentementEpoux').checked || !document.getElementById('consentementEpouse').checked)) { alert('Veuillez cocher les consentements'); valid = false; }
+            return valid;
+        }
+        
+        function updateRecap() {
+            const recap = document.getElementById('recapitulatif');
+            recap.innerHTML = `<div class="recap-section"><h4>👨 Époux</h4><p>${document.getElementById('epouxNom').value} ${document.getElementById('epouxPrenom').value}</p></div><div class="recap-section"><h4>👰 Épouse</h4><p>${document.getElementById('epouseNom').value} ${document.getElementById('epousePrenom').value}</p></div><div class="recap-section"><h4>💒 Mariage</h4><p>Le ${document.getElementById('dateMariage').value} à ${document.getElementById('lieuMariage').value}</p></div>`;
+        }
+        
+        document.getElementById('nextBtn').onclick = () => { if (validateStep(currentStep)) showStep(currentStep + 1); };
+        document.getElementById('prevBtn').onclick = () => showStep(currentStep - 1);
+        document.getElementById('submitBtn').onclick = (e) => { e.preventDefault(); alert('✅ Demande de mariage envoyée avec succès !'); };
+        
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        if (navToggle) navToggle.addEventListener('click', () => { navToggle.classList.toggle('active'); navMenu.classList.toggle('active'); });
+        
+        function ajouterTemoin() { alert('Ajout de témoin - Fonctionnalité à venir'); }
+    </script>
+</body>
+</html>

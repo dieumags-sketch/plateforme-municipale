@@ -1,0 +1,254 @@
+/* ============================================
+   AGENT ÉTAT CIVIL - STYLES SPÉCIFIQUES
+   ============================================ */
+
+/* Header agent */
+.agent-header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    padding: 40px 0;
+    text-align: center;
+    color: white;
+    margin-bottom: 32px;
+}
+
+.agent-header h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.agent-header p {
+    opacity: 0.9;
+}
+
+/* Queue des demandes */
+.queue-stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.queue-stat {
+    background: white;
+    border-radius: 16px;
+    padding: 16px 24px;
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid var(--primary);
+}
+
+.queue-stat .number {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.queue-stat .label {
+    font-size: 13px;
+    color: var(--gray-600);
+    margin-top: 4px;
+}
+
+/* Carte de demande (version agent) */
+.demande-card-agent {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s;
+    border-left: 4px solid;
+}
+
+.demande-card-agent:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+}
+
+.demande-header-agent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.demande-priority {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.priority-high { background: #fee2e2; color: #dc2626; }
+.priority-medium { background: #fef3c7; color: #d97706; }
+.priority-low { background: #d1fae5; color: #059669; }
+
+.demande-date-agent {
+    font-size: 12px;
+    color: var(--gray-500);
+}
+
+.demande-reference {
+    font-size: 12px;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.demande-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.demande-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--gray-50);
+    border-radius: 12px;
+}
+
+.demande-info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.demande-info-item i {
+    width: 20px;
+    color: var(--primary);
+}
+
+.demande-actions-agent {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--gray-200);
+}
+
+.btn-validate {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-validate:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-reject {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-reject:hover {
+    background: #dc2626;
+}
+
+.btn-detail-agent {
+    background: var(--gray-200);
+    color: var(--gray-700);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-detail-agent:hover {
+    background: var(--gray-300);
+}
+
+/* Modal vérification */
+.modal-verification {
+    max-width: 800px;
+}
+
+.verification-section {
+    margin-bottom: 20px;
+}
+
+.verification-section h4 {
+    color: var(--primary);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.verification-field {
+    display: flex;
+    margin-bottom: 8px;
+    padding: 8px;
+    background: var(--gray-50);
+    border-radius: 8px;
+}
+
+.verification-label {
+    width: 140px;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.verification-value {
+    flex: 1;
+    color: var(--gray-800);
+}
+
+.verification-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding: 12px;
+    background: #d1fae5;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .demande-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .demande-actions-agent {
+        flex-direction: column;
+    }
+    
+    .btn-validate, .btn-reject, .btn-detail-agent {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reçu de paiement - Commune Bot-Makak</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/modules/paiements.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .recu-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .recu-header {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .recu-header .logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .recu-header .logo i {
+            font-size: 40px;
+            color: #1a237e;
+        }
+        .recu-header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .recu-body {
+            padding: 40px;
+        }
+        .recu-section {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 20px;
+        }
+        .recu-section h3 {
+            color: #1a237e;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        .recu-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+        .recu-label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+        .recu-value {
+            color: #212529;
+        }
+        .recu-total {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+        }
+        .recu-total .recu-row {
+            margin-bottom: 0;
+            font-weight: bold;
+        }
+        .recu-footer {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .btn-print {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .btn-print:hover {
+            transform: scale(1.1);
+        }
+        @media print {
+            .navbar, .btn-print, .paiements-header, .footer {
+                display: none !important;
+            }
+            .recu-container {
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">[MENU]</nav>
+
+    <div id="recuContent" class="recu-container">
+        <div class="recu-header">
+            <div class="logo">
+                <i class="fas fa-city"></i>
+            </div>
+            <h1>MAIRIE DE BOT-MAKAK</h1>
+            <p>Reçu de paiement officiel</p>
+        </div>
+        
+        <div class="recu-body">
+            <div class="recu-section">
+                <h3><i class="fas fa-receipt"></i> Informations du reçu</h3>
+                <div class="recu-row">
+                    <span class="recu-label">N° Reçu :</span>
+                    <span class="recu-value" id="recuNumero">-</span>
+                </div>
+                <div class="recu-row">
+                    <span class="recu-label">Date d'émission :</span>
+                    <span class="recu-value" id="recuDate">-</span>
+                </div>
+                <div class="recu-row">
+                    <span class="recu-label">Statut :</span>
+                    <span class="recu-value" style="color: #10b981;" id="recuStatut">✓ Payé</span>
+                </div>
+            </div>
+            
+            <div class="recu-section">
+                <h3><i class="fas fa-user"></i> Informations du payeur</h3>
+                <div class="recu-row">
+                    <span class="recu-label">Nom complet :</span>
+                    <span class="recu-value" id="recuNom">-</span>
+                </div>
+                <div class="recu-row">
+                    <span class="recu-label">Email :</span>
+                    <span class="recu-value" id="recuEmail">-</span>
+                </div>
+                <div class="recu-row">
+                    <span class="recu-label">Téléphone :</span>
+                    <span class="recu-value" id="recuTelephone">-</span>
+                </div>
+            </div>
+            
+            <div class="recu-section">
+                <h3><i class="fas fa-credit-card"></i> Détails du paiement</h3>
+                <div class="recu-row">
+                    <span class="recu-label">Référence transaction :</span>
+                    <span class="recu-value" id="recuReference">-</span>
+                </div>
+                <div class="recu-row">
+                    <span class="recu-label">Mode de paiement :</span>
+                    <span class="recu-value" id="recuMode">-</span>
+                </div>
+                <div class="recu-row">
+                    <span class="recu-label">Date du paiement :</span>
+                    <span class="recu-value" id="recuDatePaiement">-</span>
+                </div>
+                <div class="recu-row">
+                    <span class="recu-label">Service :</span>
+                    <span class="recu-value" id="recuService">-</span>
+                </div>
+                <div class="recu-row">
+                    <span class="recu-label">Référence service :</span>
+                    <span class="recu-value" id="recuSourceId">-</span>
+                </div>
+                <div class="recu-total">
+                    <div class="recu-row">
+                        <span class="recu-label">Montant net :</span>
+                        <span class="recu-value" id="recuNet">-</span>
+                    </div>
+                    <div class="recu-row">
+                        <span class="recu-label">Frais :</span>
+                        <span class="recu-value" id="recuFrais">-</span>
+                    </div>
+                    <div class="recu-row">
+                        <span class="recu-label">Taxe :</span>
+                        <span class="recu-value" id="recuTaxe">-</span>
+                    </div>
+                    <div class="recu-row" style="font-size: 18px; margin-top: 8px;">
+                        <span class="recu-label"><strong>Total payé :</strong></span>
+                        <span class="recu-value"><strong id="recuTotal">-</strong></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recu-section">
+                <h3><i class="fas fa-check-circle"></i> Validation</h3>
+                <div class="recu-row">
+                    <span class="recu-label">Numéro transaction :</span>
+                    <span class="recu-value" id="recuTransactionId">-</span>
+                </div>
+                <div class="recu-row">
+                    <span class="recu-label">Validé par :</span>
+                    <span class="recu-value">Système automatisé</span>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <div id="qrcode" style="display: inline-block; padding: 10px; background: white; border-radius: 10px;"></div>
+                <p style="font-size: 12px; color: #6c757d; margin-top: 8px;">Scannez ce QR code pour vérifier l'authenticité</p>
+            </div>
+        </div>
+        
+        <div class="recu-footer">
+            <p>Ce reçu est généré automatiquement et fait foi de paiement.</p>
+            <p>Mairie de Bot-Makak - Avenue de la République - BP 123 Bot-Makak</p>
+            <p>Tél: (+237) 6XX XXX XXX - Email: contact@botmatmakak.net</p>
+        </div>
+    </div>
+
+    <button class="btn-print" onclick="imprimerRecu()">
+        <i class="fas fa-print"></i>
+    </button>
+
+    <script src="../../js/api.js"></script>
+    <script src="../../js/modules/paiements-recu.js"></script>
+</body>
+</html>

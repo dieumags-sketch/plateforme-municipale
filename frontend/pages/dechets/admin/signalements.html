@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des signalements - Admin</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .filters{display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
+        .filter-select{padding:0.5rem;border:1px solid #e5e7eb;border-radius:8px}
+        .signalement-card{background:white;border-radius:16px;padding:1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+        .signalement-info{flex:1}
+        .signalement-type{font-weight:bold;margin-bottom:0.25rem}
+        .signalement-adresse{font-size:0.875rem;color:#6b7280}
+        .signalement-photo{width:80px;height:80px;background:#f3f4f6;border-radius:8px;margin-right:1rem;display:flex;align-items:center;justify-content:center}
+        .signalement-photo img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+        .btn-traiter{background:#059669;color:white;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer}
+        .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center}
+        .modal-content{background:white;border-radius:20px;padding:2rem;max-width:500px;width:90%}
+    </style>
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <aside class="admin-sidebar">...</aside>
+        <main class="admin-main">
+            <h1>Gestion des signalements</h1>
+            <div class="filters">
+                <select id="status-filter" class="filter-select"><option value="">Tous</option><option value="en_attente">En attente</option><option value="en_cours">En cours</option><option value="traite">Traité</option></select>
+                <select id="type-filter" class="filter-select"><option value="">Tous types</option><option value="bac_plein">Bac plein</option><option value="bac_debordant">Bac débordant</option><option value="bac_casse">Bac cassé</option><option value="depot_sauvage">Dépôt sauvage</option></select>
+            </div>
+            <div id="signalements-list">Chargement...</div>
+        </main>
+    </div>
+    
+    <div id="traiter-modal" class="modal">
+        <div class="modal-content">
+            <h3>Traiter le signalement</h3>
+            <textarea id="commentaire" rows="3" placeholder="Commentaire de traitement..." style="width:100%;padding:0.5rem;border:1px solid #e5e7eb;border-radius:8px"></textarea>
+            <div class="modal-buttons" style="display:flex;gap:1rem;margin-top:1rem">
+                <button id="confirm-traiter" class="btn-traiter">Marquer comme traité</button>
+                <button id="close-modal" style="background:#e5e7eb;border:none;padding:0.5rem 1rem;border-radius:8px">Annuler</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000/api/dechets';
+        const token = localStorage.getItem('auth_token');
+        let currentSignalementId = null;
+        
+        async function loadSignalements() {
+            const status = document.getElementById('status-filter').value;
+            const type = document.getElementById('type-filter').value;
+            let url = `${API_BASE}/signalements/`;
+            if (status) url += `?statut=${status}`;
+            if (type) url += `${status ? '&' : '?'}type_signalement=${type}`;
+            
+            const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await response.json();
+            
+            const container = document.getElementById('signalements-list');
+            if (!data.results?.length) { container.innerHTML = '<div>Aucun signalement</div>'; return; }
+            
+            container.innerHTML = data.results.map(s => `
+                <div class="signalement-card">
+                    <div class="signalement-info">
+                        <div class="signalement-type">${s.type_icon || '📌'} ${s.type_signalement}</div>
+                        <div>📍 ${s.adresse_description}</div>
+                        <div>📅 ${new Date(s.date_signalement).toLocaleString('fr-FR')}</div>
+                        <div>📞 ${s.telephone || 'Non renseigné'}</div>
+                        <div>📊 Statut: ${s.statut}</div>
+                    </div>
+                    ${s.photo ? `<div class="signalement-photo"><img src="${s.photo}" alt="Photo"></div>` : ''}
+                    <button class="btn-traiter" onclick="ouvrirTraiter(${s.id})">Traiter</button>
+                </div>
+            `).join('');
+        }
+        
+        function ouvrirTraiter(id) {
+            currentSignalementId = id;
+            document.getElementById('traiter-modal').style.display = 'flex';
+        }
+        
+        document.getElementById('confirm-traiter').addEventListener('click', async () => {
+            const commentaire = document.getElementById('commentaire').value;
+            await fetch(`${API_BASE}/signalements/${currentSignalementId}/traiter/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ commentaire })
+            });
+            document.getElementById('traiter-modal').style.display = 'none';
+            document.getElementById('commentaire').value = '';
+            loadSignalements();
+        });
+        
+        document.getElementById('close-modal').addEventListener('click', () => {
+            document.getElementById('traiter-modal').style.display = 'none';
+        });
+        
+        document.getElementById('status-filter').addEventListener('change', loadSignalements);
+        document.getElementById('type-filter').addEventListener('change', loadSignalements);
+        
+        loadSignalements();
+    </script>
+</body>
+</html>

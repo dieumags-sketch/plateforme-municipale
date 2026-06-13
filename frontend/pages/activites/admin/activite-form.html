@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire activité - Admin</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .form-container { max-width: 800px; margin: 0 auto; background: white; padding: 2rem; border-radius: 20px; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 12px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .btn-primary { background: #667eea; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 12px; cursor: pointer; }
+    </style>
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <aside class="admin-sidebar">...</aside>
+        <main class="admin-main">
+            <h1 id="form-title">Nouvelle activité</h1>
+            <div class="form-container">
+                <form id="activite-form">
+                    <div class="form-group"><label>Titre *</label><input type="text" id="titre" required></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Type *</label><select id="type_activite"><option value="sante">Santé</option><option value="formation">Formation</option><option value="culturel">Culturel</option><option value="sportif">Sportif</option><option value="social">Social</option><option value="environnement">Environnement</option><option value="citoyen">Citoyen</option></select></div>
+                        <div class="form-group"><label>Statut</label><select id="statut"><option value="brouillon">Brouillon</option><option value="publie">Publié</option></select></div>
+                    </div>
+                    <div class="form-group"><label>Description courte</label><textarea id="description_courte" rows="2"></textarea></div>
+                    <div class="form-group"><label>Description longue</label><textarea id="description_longue" rows="5"></textarea></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Date début *</label><input type="datetime-local" id="date_debut" required></div>
+                        <div class="form-group"><label>Date fin *</label><input type="datetime-local" id="date_fin" required></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Lieu</label><input type="text" id="lieu"></div>
+                        <div class="form-group"><label>Ville</label><input type="text" id="ville"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Capacité max (0 = illimité)</label><input type="number" id="capacite_max" value="0"></div>
+                        <div class="form-group"><label>Prix (FCFA)</label><input type="number" id="prix" value="0"></div>
+                    </div>
+                    <div class="form-group"><label>Image principale (URL)</label><input type="url" id="image_principale" placeholder="https://..."></div>
+                    <button type="submit" class="btn-primary">Enregistrer</button>
+                </form>
+            </div>
+        </main>
+    </div>
+    <script>
+        const API_BASE = 'http://localhost:8000/api/activites';
+        const token = localStorage.getItem('auth_token');
+        if (!token) window.location.href = '../../accounts/login.html';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const activiteId = urlParams.get('id');
+        if (activiteId) { document.getElementById('form-title').innerText = 'Modifier activité'; loadActivite(); }
+        
+        async function loadActivite() {
+            const response = await fetch(`${API_BASE}/activites/${activiteId}/`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const act = await response.json();
+            document.getElementById('titre').value = act.titre;
+            document.getElementById('type_activite').value = act.type_activite;
+            document.getElementById('statut').value = act.statut;
+            document.getElementById('description_courte').value = act.description_courte;
+            document.getElementById('description_longue').value = act.description_longue || '';
+            document.getElementById('date_debut').value = act.date_debut?.slice(0, 16);
+            document.getElementById('date_fin').value = act.date_fin?.slice(0, 16);
+            document.getElementById('lieu').value = act.lieu;
+            document.getElementById('ville').value = act.ville;
+            document.getElementById('capacite_max').value = act.capacite_max;
+            document.getElementById('prix').value = act.prix;
+            document.getElementById('image_principale').value = act.image_principale || '';
+        }
+        
+        document.getElementById('activite-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = { titre: document.getElementById('titre').value, type_activite: document.getElementById('type_activite').value, statut: document.getElementById('statut').value, description_courte: document.getElementById('description_courte').value, description_longue: document.getElementById('description_longue').value, date_debut: document.getElementById('date_debut').value, date_fin: document.getElementById('date_fin').value, lieu: document.getElementById('lieu').value, ville: document.getElementById('ville').value, capacite_max: parseInt(document.getElementById('capacite_max').value), prix: parseInt(document.getElementById('prix').value), image_principale: document.getElementById('image_principale').value };
+            const url = activiteId ? `${API_BASE}/activites/${activiteId}/` : `${API_BASE}/activites/`;
+            const method = activiteId ? 'PUT' : 'POST';
+            const response = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(data) });
+            if (response.ok) { window.location.href = 'activites.html'; } else { alert('Erreur'); }
+        });
+    </script>
+</body>
+</html>

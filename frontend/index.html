@@ -1,0 +1,163 @@
+<!-- frontend/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Plateforme Municipale | Accueil</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-city"></i>
+                <span>Plateforme Municipale</span>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="active">Accueil</a></li>
+                <li><a href="pages/actualites/">Actualités</a></li>
+                <li><a href="pages/annuaires/">Annuaires</a></li>
+                <li><a href="pages/dechets/">Gestion des déchets</a></li>
+                <li><a href="pages/activites/">Activités</a></li>
+                <li><a href="pages/accounts/login.html" class="btn-login"><i class="fas fa-user"></i> Connexion</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Bienvenue à <span class="highlight">Bot-Makak</span></h1>
+            <p> Notre nouvelle plateforme municipale : Proche, Rapide, Sécurisée. </p>
+            <div class="hero-buttons">
+                <a href="#services" class="btn-primary">Découvrir les services <i class="fas fa-arrow-right"></i></a>
+                <a href="pages/accounts/register.html" class="btn-secondary">Créer un compte <i class="fas fa-user-plus"></i></a>
+            </div>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <h3>+10K</h3>
+                <p>Citoyens actifs</p>
+            </div>
+            <div class="stat">
+                <h3>50+</h3>
+                <p>Services municipaux</p>
+            </div>
+            <div class="stat">
+                <h3>24/7</h3>
+                <p>Disponibilité</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">Nos services municipaux</h2>
+            <p class="section-subtitle">Des services modernes pour une ville connectée</p>
+            
+            <div class="services-grid">
+                <div class="service-card" data-module="etat-civil">
+                    <div class="service-icon"><i class="fas fa-birthday-cake"></i></div>
+                    <h3>État Civil</h3>
+                    <p>Naissances, mariages, décès - Démarches en ligne simplifiées</p>
+                    <a href="pages/etat-civil/" class="service-link">Accéder <i class="fas fa-chevron-right"></i></a>
+                </div>
+                
+                <div class="service-card" data-module="signature">
+                    <div class="service-icon"><i class="fas fa-signature"></i></div>
+                    <h3>Signature Électronique</h3>
+                    <p>Signez vos documents officiels en toute sécurité</p>
+                    <a href="pages/signature/" class="service-link">Accéder <i class="fas fa-chevron-right"></i></a>
+                </div>
+                
+                <div class="service-card" data-module="actualites">
+                    <div class="service-icon"><i class="fas fa-newspaper"></i></div>
+                    <h3>Actualités</h3>
+                    <p>Restez informés des dernières nouvelles municipales</p>
+                    <a href="pages/actualites/" class="service-link">Accéder <i class="fas fa-chevron-right"></i></a>
+                </div>
+                
+                <div class="service-card" data-module="annuaires">
+                    <div class="service-icon"><i class="fas fa-address-book"></i></div>
+                    <h3>Annuaires</h3>
+                    <p>Contacts des services et élus municipaux</p>
+                    <a href="pages/annuaires/" class="service-link">Accéder <i class="fas fa-chevron-right"></i></a>
+                </div>
+                
+                <div class="service-card" data-module="archives">
+                    <div class="service-icon"><i class="fas fa-archive"></i></div>
+                    <h3>Archives</h3>
+                    <p>Consultez les documents d'archives municipales</p>
+                    <a href="pages/archives/" class="service-link">Accéder <i class="fas fa-chevron-right"></i></a>
+                </div>
+            
+                <div class="service-card" data-module="paiements">
+                    <div class="service-icon"><i class="fas fa-credit-card"></i></div>
+                    <h3>Paiements</h3>
+                    <p>Payez vos taxes et amendes en ligne</p>
+                    <a href="pages/paiements/" class="service-link">Accéder <i class="fas fa-chevron-right"></i></a>
+                </div>
+                
+                <div class="service-card" data-module="dechets">
+                    <div class="service-icon"><i class="fas fa-trash-alt"></i></div>
+                    <h3>Gestion des déchets</h3>
+                    <p>Signalement et collecte des déchets</p>
+                    <a href="pages/dechets/" class="service-link">Accéder <i class="fas fa-chevron-right"></i></a>
+                </div>
+                
+                <div class="service-card" data-module="activites">
+                    <div class="service-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <h3>Activités</h3>
+                    <p>Événements et activités culturelles</p>
+                    <a href="pages/activites/" class="service-link">Accéder <i class="fas fa-chevron-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Plateforme Municipale</h3>
+                <p>Votre mairie en ligne, accessible 24h/24</p>
+            </div>
+            <div class="footer-section">
+                <h4>Liens utiles</h4>
+                <ul>
+                    <li><a href="#">Mentions légales</a></li>
+                    <li><a href="#">Politique de confidentialité</a></li>
+                    <li><a href="#">CGU</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Suivez-nous</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Mairie Bot-Makak / By Dieumag</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/api.js"></script>
+</body>
+</html>

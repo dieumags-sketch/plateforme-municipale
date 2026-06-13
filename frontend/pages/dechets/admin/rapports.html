@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapports - Admin Déchets</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .rapports-container{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+        .rapport-card{background:white;border-radius:16px;padding:1.5rem}
+        .rapport-card h3{margin-bottom:1rem}
+        .export-buttons{display:flex;gap:1rem;margin-top:1rem}
+        .btn-export{background:#059669;color:white;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer}
+        @media (max-width:768px){.rapports-container{grid-template-columns:1fr}}
+    </style>
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <aside class="admin-sidebar">...</aside>
+        <main class="admin-main">
+            <h1>Rapports et statistiques</h1>
+            <div class="rapports-container">
+                <div class="rapport-card"><h3>Évolution des collectes</h3><canvas id="evolutionChart"></canvas></div>
+                <div class="rapport-card"><h3>Signalements par quartier</h3><canvas id="quartiersChart"></canvas></div>
+                <div class="rapport-card"><h3>Performance agents</h3><canvas id="agentsChart"></canvas></div>
+                <div class="rapport-card"><h3>Taux de résolution</h3><canvas id="resolutionChart"></canvas></div>
+            </div>
+            <div class="export-buttons"><button class="btn-export" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Exporter PDF</button><button class="btn-export" onclick="exportCSV()"><i class="fas fa-file-excel"></i> Exporter CSV</button></div>
+        </main>
+    </div>
+    <script>
+        new Chart(document.getElementById('evolutionChart'), { type: 'line', data: { labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'], datasets: [{ label: 'Tonnes collectées', data: [12, 15, 18, 22], borderColor: '#059669' }] } });
+        new Chart(document.getElementById('quartiersChart'), { type: 'bar', data: { labels: ['Ndikinimeki', 'Bot-Makak Centre', 'Makak', 'Nkolmeyang'], datasets: [{ label: 'Signalements', data: [25, 18, 12, 8], backgroundColor: '#f59e0b' }] } });
+        function exportPDF() { alert('Export PDF - Fonctionnalité à implémenter avec jsPDF'); }
+        function exportCSV() { alert('Export CSV - Fonctionnalité à implémenter'); }
+    </script>
+</body>
+</html>

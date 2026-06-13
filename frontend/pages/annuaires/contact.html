@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacter la structure - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .contact-container {
+            max-width: 700px;
+            margin: 120px auto 2rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        }
+        .contact-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .contact-header h1 {
+            font-size: 1.8rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        .structure-info {
+            background: #f9fafb;
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .structure-info i {
+            font-size: 2rem;
+            color: #667eea;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(102,126,234,0.4);
+        }
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            color: white;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+        .toast-success { background: #10b981; }
+        .toast-error { background: #ef4444; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @media (max-width: 640px) {
+            .contact-container { margin: 100px 1rem 2rem; padding: 1.5rem; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-city"></i> Plateforme Municipale</div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/index.html">Actualités</a></li>
+                <li><a href="../activites/index.html">Activités</a></li>
+                <li><a href="index.html" class="active">Annuaire</a></li>
+                <li><a href="elus.html">Élus</a></li>
+                <li><a href="mes-favoris.html"><i class="fas fa-heart"></i> Favoris</a></li>
+                <li><a href="../accounts/profile.html"><i class="fas fa-user"></i> Mon compte</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="contact-container">
+        <div class="contact-header">
+            <h1><i class="fas fa-envelope"></i> Contacter la structure</h1>
+            <p>Envoyez un message directement à la structure municipale</p>
+        </div>
+
+        <div id="structure-info" class="structure-info">
+            <i class="fas fa-building"></i>
+            <div>
+                <strong id="structure-nom">Chargement...</strong>
+                <span id="structure-adresse" style="font-size: 0.875rem; color: #6b7280;"></span>
+            </div>
+        </div>
+
+        <form id="contact-form">
+            <input type="hidden" id="structure-id">
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nom complet *</label>
+                    <input type="text" id="nom" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email *</label>
+                    <input type="email" id="email" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Téléphone</label>
+                    <input type="tel" id="telephone">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Sujet *</label>
+                    <select id="sujet" required>
+                        <option value="information">Demande d'information</option>
+                        <option value="rdv">Prise de rendez-vous</option>
+                        <option value="reclamation">Réclamation</option>
+                        <option value="suggestion">Suggestion</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-comment"></i> Message *</label>
+                <textarea id="message" rows="5" placeholder="Votre message..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-paper-plane"></i> Envoyer le message
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/annuaires';
+        const token = localStorage.getItem('auth_token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        // Vérification authentification
+        if (!token) {
+            window.location.href = '../accounts/login.html';
+        }
+
+        // Récupérer l'ID de la structure depuis l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const structureId = urlParams.get('id');
+
+        if (!structureId) {
+            window.location.href = 'index.html';
+        }
+
+        // Charger les informations de la structure
+        async function loadStructure() {
+            try {
+                const response = await fetch(`${API_BASE}/structures/${structureId}/`);
+                const structure = await response.json();
+                
+                document.getElementById('structure-id').value = structure.id;
+                document.getElementById('structure-nom').textContent = structure.nom;
+                document.getElementById('structure-adresse').textContent = structure.adresse || structure.quartier || '';
+                
+                // Pré-remplir avec les infos utilisateur
+                document.getElementById('nom').value = user.full_name || `${user.prenom || ''} ${user.nom || ''}`.trim();
+                document.getElementById('email').value = user.email || '';
+                document.getElementById('telephone').value = user.telephone || '';
+            } catch (error) {
+                console.error('Erreur:', error);
+                showToast('Erreur de chargement de la structure', 'error');
+            }
+        }
+
+        // Envoyer le formulaire de contact
+        document.getElementById('contact-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                structure: parseInt(structureId),
+                nom: document.getElementById('nom').value,
+                email: document.getElementById('email').value,
+                telephone: document.getElementById('telephone').value,
+                sujet: document.getElementById('sujet').value,
+                message: document.getElementById('message').value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/structures/${structureId}/contact/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showToast('Votre message a été envoyé avec succès !', 'success');
+                    setTimeout(() => {
+                        window.location.href = `structure-detail.html?id=${structureId}`;
+                    }, 2000);
+                } else {
+                    showToast(data.error || 'Erreur lors de l\'envoi', 'error');
+                }
+            } catch (error) {
+                showToast('Erreur de connexion', 'error');
+            }
+        });
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        loadStructure();
+    </script>
+</body>
+</html>

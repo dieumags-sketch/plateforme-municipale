@@ -1,0 +1,136 @@
+cd frontend/pages/accounts
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion par reconnaissance faciale - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-city"></i>
+                    <span>Plateforme Municipale</span>
+                </div>
+                <h1>Reconnaissance faciale</h1>
+                <p>Connectez-vous avec votre visage</p>
+            </div>
+
+            <div class="face-preview" style="text-align: center;">
+                <div id="face-camera" style="position: relative; width: 100%; height: 300px; background: #1f2937; border-radius: 16px; overflow: hidden; margin-bottom: 1rem;">
+                    <video id="face-video" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+                    <div id="face-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); color: white;">
+                        <i class="fas fa-camera" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                        <span>Positionnez votre visage</span>
+                    </div>
+                </div>
+                <button id="start-camera" class="btn-camera" style="padding: 0.75rem 1.5rem; background: #f3f4f6; border: none; border-radius: 12px; cursor: pointer;">
+                    <i class="fas fa-video"></i> Activer la caméra
+                </button>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="face-email" placeholder="votre@email.com" style="width: 100%; padding: 0.875rem; border: 2px solid #e5e7eb; border-radius: 12px;">
+            </div>
+
+            <button id="face-submit" class="btn-auth" style="width: 100%; margin-top: 1rem;" disabled>
+                <i class="fas fa-face-smile"></i> Se connecter avec le visage
+            </button>
+
+            <div class="auth-footer" style="margin-top: 1.5rem; text-align: center;">
+                <a href="login.html" style="color: #667eea;">← Retour à la connexion classique</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/accounts';
+        let faceStream = null;
+        let currentFaceImage = null;
+        
+        async function startCamera() {
+            const video = document.getElementById('face-video');
+            const overlay = document.getElementById('face-overlay');
+            const cameraBtn = document.getElementById('start-camera');
+            
+            try {
+                faceStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = faceStream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    if (overlay) overlay.style.display = 'none';
+                    if (cameraBtn) cameraBtn.innerHTML = '<i class="fas fa-check"></i> Caméra active';
+                    captureFrame();
+                };
+            } catch (error) {
+                alert('Impossible d\'accéder à la caméra');
+            }
+        }
+        
+        function captureFrame() {
+            const video = document.getElementById('face-video');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            currentFaceImage = canvas.toDataURL('image/jpeg');
+            document.getElementById('face-submit').disabled = false;
+        }
+        
+        function dataURLtoFile(dataurl, filename) {
+            const arr = dataurl.split(',');
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) { u8arr[n] = bstr.charCodeAt(n); }
+            return new File([u8arr], filename, { type: mime });
+        }
+        
+        async function faceLogin() {
+            const email = document.getElementById('face-email').value;
+            if (!email) { alert('Email requis'); return; }
+            if (!currentFaceImage) { alert('Activez la caméra et positionnez votre visage'); return; }
+            
+            const faceFile = dataURLtoFile(currentFaceImage, 'face.jpg');
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('face_image', faceFile);
+            
+            try {
+                const response = await fetch(`${API_BASE}/face/login/`, { method: 'POST', body: formData });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('auth_token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    alert('Connexion réussie !');
+                    window.location.href = '../../index.html';
+                } else {
+                    alert(data.error || 'Visage non reconnu');
+                }
+            } catch (error) {
+                alert('Erreur de connexion');
+            }
+        }
+        
+        document.getElementById('start-camera').addEventListener('click', startCamera);
+        document.getElementById('face-submit').addEventListener('click', faceLogin);
+        
+        // Capture toutes les 2 secondes
+        setInterval(() => {
+            const video = document.getElementById('face-video');
+            if (video && video.srcObject && video.videoWidth > 0) {
+                captureFrame();
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

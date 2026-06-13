@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mode hors ligne - Agent</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .offline-container{max-width:600px;margin:100px auto;padding:2rem;text-align:center}
+        .sync-card{background:white;border-radius:20px;padding:2rem;box-shadow:0 10px 25px rgba(0,0,0,0.1)}
+        .sync-status{font-size:1.2rem;margin:1rem 0}
+        .sync-status.synced{color:#059669}
+        .sync-status.pending{color:#f59e0b}
+        .btn-sync{background:#059669;color:white;padding:0.75rem 1.5rem;border:none;border-radius:12px;cursor:pointer;margin-top:1rem}
+        .data-list{margin-top:1.5rem;text-align:left}
+        .data-item{background:#f9fafb;padding:0.75rem;border-radius:8px;margin-bottom:0.5rem}
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="sync-card">
+            <i class="fas fa-cloud-upload-alt" style="font-size:3rem;color:#059669"></i>
+            <h2>Synchronisation hors ligne</h2>
+            <div id="sync-status" class="sync-status pending">
+                <i class="fas fa-spinner fa-spin"></i> Vérification...
+            </div>
+            <div id="data-list" class="data-list"></div>
+            <button id="sync-now" class="btn-sync"><i class="fas fa-sync-alt"></i> Synchroniser maintenant</button>
+        </div>
+    </div>
+    <script>
+        const API_BASE = 'http://localhost:8000/api/dechets';
+        const token = localStorage.getItem('auth_token');
+        
+        async function checkPendingSync() {
+            // Vérifier IndexedDB pour les données en attente
+            const pendingSignalements = JSON.parse(localStorage.getItem('offline_signalements') || '[]');
+            const pendingTournees = JSON.parse(localStorage.getItem('offline_tournees') || '[]');
+            
+            const container = document.getElementById('data-list');
+            const statusDiv = document.getElementById('sync-status');
+            
+            const total = pendingSignalements.length + pendingTournees.length;
+            
+            if (total === 0) {
+                statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> Tout est synchronisé';
+                statusDiv.className = 'sync-status synced';
+                container.innerHTML = '<p>Aucune donnée en attente</p>';
+            } else {
+                statusDiv.innerHTML = `<i class="fas fa-clock"></i> ${total} élément(s) en attente de synchronisation`;
+                statusDiv.className = 'sync-status pending';
+                container.innerHTML = `
+                    <h4>Données à synchroniser :</h4>
+                    ${pendingSignalements.length ? `<div class="data-item"><i class="fas fa-exclamation-triangle"></i> ${pendingSignalements.length} signalement(s)</div>` : ''}
+                    ${pendingTournees.length ? `<div class="data-item"><i class="fas fa-truck"></i> ${pendingTournees.length} tournée(s)</div>` : ''}
+                `;
+            }
+        }
+        
+        async function syncNow() {
+            document.getElementById('sync-now').disabled = true;
+            document.getElementById('sync-now').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Synchronisation...';
+            
+            const pendingSignalements = JSON.parse(localStorage.getItem('offline_signalements') || '[]');
+            const results = [];
+            
+            for (const sig of pendingSignalements) {
+                try {
+                    const response = await fetch(`${API_BASE}/signalements/`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(sig.data)
+                    });
+                    if (response.ok) results.push({ id: sig.id, success: true });
+                } catch (e) { results.push({ id: sig.id, success: false }); }
+            }
+            
+            const successResults = results.filter(r => r.success);
+            const remaining = pendingSignalements.filter(s => !successResults.find(r => r.id === s.id));
+            localStorage.setItem('offline_signalements', JSON.stringify(remaining));
+            
+            document.getElementById('sync-now').disabled = false;
+            document.getElementById('sync-now').innerHTML = '<i class="fas fa-sync-alt"></i> Synchroniser maintenant';
+            checkPendingSync();
+            alert(`${successResults.length} élément(s) synchronisé(s)`);
+        }
+        
+        document.getElementById('sync-now').addEventListener('click', syncNow);
+        checkPendingSync();
+        
+        if (!token) window.location.href = '../../accounts/login.html';
+    </script>
+</body>
+</html>

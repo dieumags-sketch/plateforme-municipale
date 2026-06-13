@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activités municipales - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/activites.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Styles supplémentaires pour la page activités */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .btn-sm {
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-sm:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(102,126,234,0.4);
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .no-results, .error {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+            color: #6b7280;
+        }
+        
+        .error {
+            color: #ef4444;
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .page-btn:hover:not(.active) {
+            background: #f1f5f9;
+        }
+        
+        .activity-type {
+            font-size: 0.75rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            color: white;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast-success {
+            background: #10b981;
+        }
+        
+        .toast-error {
+            background: #ef4444;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-city"></i>
+                <span>Plateforme Municipale</span>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/index.html">Actualités</a></li>
+                <li><a href="index.html" class="active">Activités</a></li>
+                <li><a href="mes-inscriptions.html">Mes inscriptions</a></li>
+                <li><a href="../accounts/profile.html" class="btn-login"><i class="fas fa-user"></i> Mon compte</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="activites-hero">
+        <h1>Activités municipales</h1>
+        <p>Découvrez et participez aux événements de votre commune</p>
+    </section>
+
+    <div class="container">
+        <!-- Barre de filtres -->
+        <div class="filters-bar">
+            <div class="filter-group">
+                <select id="type-filter" class="filter-select">
+                    <option value="">Tous les types</option>
+                    <option value="sante">🏥 Campagne de santé</option>
+                    <option value="formation">📚 Formation</option>
+                    <option value="culturel">🎭 Événement culturel</option>
+                    <option value="sportif">⚽ Événement sportif</option>
+                    <option value="social">🤝 Action sociale</option>
+                    <option value="environnement">🌱 Environnement</option>
+                    <option value="citoyen">🗳️ Réunion citoyenne</option>
+                </select>
+                
+                <input type="text" id="search-input" class="filter-input" placeholder="Rechercher une activité...">
+                
+                <select id="price-filter" class="filter-select">
+                    <option value="">Tous les prix</option>
+                    <option value="free">Gratuit</option>
+                    <option value="paid">Payant</option>
+                </select>
+                
+                <button id="search-btn" class="btn-primary">Rechercher</button>
+            </div>
+        </div>
+
+        <!-- Grille des activités -->
+        <div id="activites-grid" class="activites-grid">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Plateforme Municipale</h3>
+                <p>Votre mairie en ligne, accessible 24h/24</p>
+            </div>
+            <div class="footer-section">
+                <h4>Liens utiles</h4>
+                <ul>
+                    <li><a href="#">Mentions légales</a></li>
+                    <li><a href="#">Politique de confidentialité</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Suivez-nous</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Plateforme Municipale - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'http://localhost:8000/api/activites';
+        let currentPage = 1;
+        let currentFilters = {
+            type_activite: '',
+            search: '',
+            est_gratuit: null
+        };
+        
+        // Vérifier authentication
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            // Rediriger vers login si non connecté
+            window.location.href = '../accounts/login.html';
+        }
+        
+        // Fonctions principales
+        async function loadActivites() {
+            const grid = document.getElementById('activites-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+            
+            try {
+                let url = `${API_BASE}/activites/?page=${currentPage}`;
+                if (currentFilters.type_activite) url += `&type_activite=${currentFilters.type_activite}`;
+                if (currentFilters.search) url += `&search=${encodeURIComponent(currentFilters.search)}`;
+                if (currentFilters.est_gratuit !== null) url += `&est_gratuit=${currentFilters.est_gratuit}`;
+                
+                console.log('Fetching:', url);
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Data received:', data);
+                
+                if (data.results && data.results.length > 0) {
+                    renderActivites(data.results);
+                    renderPagination(data);
+                } else {
+                    grid.innerHTML = '<div class="no-results">Aucune activité trouvée pour le moment.</div>';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                grid.innerHTML = '<div class="error">Erreur de chargement des activités. Vérifiez que le serveur Django est démarré.</div>';
+            }
+        }
+        
+        function renderActivites(activites) {
+            const grid = document.getElementById('activites-grid');
+            
+            if (!activites || activites.length === 0) {
+                grid.innerHTML = '<div class="no-results">Aucune activité disponible</div>';
+                return;
+            }
+            
+            grid.innerHTML = activites.map(act => `
+                <div class="activity-card">
+                    <div class="activity-image">
+                        <img src="${act.image_principale || 'https://via.placeholder.com/400x200?text=Activité'}" alt="${escapeHtml(act.titre)}" onerror="this.src='https://via.placeholder.com/400x200?text=Image+non+disponible'">
+                        ${act.est_gratuit ? '<span class="activity-badge gratuit">GRATUIT</span>' : ''}
+                        ${act.places_restantes === 0 ? '<span class="activity-badge complet">COMPLET</span>' : ''}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-type">${getTypeIcon(act.type_activite)} ${getTypeLabel(act.type_activite)}</div>
+                        <h3 class="activity-title"><a href="detail.html?id=${act.id}">${escapeHtml(act.titre)}</a></h3>
+                        <div class="activity-info">
+                            <span><i class="fas fa-calendar"></i> ${formatDate(act.date_debut)}</span>
+                            <span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(act.lieu)}</span>
+                        </div>
+                        <div class="activity-price">
+                            ${act.est_gratuit ? 'GRATUIT' : `${parseInt(act.prix).toLocaleString()} FCFA`}
+                        </div>
+                        <div class="activity-footer">
+                            <span><i class="fas fa-users"></i> ${act.nb_inscrits || 0} inscrits</span>
+                            <a href="detail.html?id=${act.id}" class="btn-sm">Voir détails</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderPagination(data) {
+            const pagination = document.getElementById('pagination');
+            if (!pagination) return;
+            
+            if (!data.total_pages || data.total_pages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let html = '<div class="pagination-container"><div class="pagination">';
+            
+            if (data.has_previous) {
+                html += `<button class="page-btn" data-page="${data.previous_page_number}"><i class="fas fa-chevron-left"></i></button>`;
+            }
+            
+            for (let i = 1; i <= data.total_pages; i++) {
+                if (i === currentPage) {
+                    html += `<button class="page-btn active" data-page="${i}">${i}</button>`;
+                } else if (Math.abs(i - currentPage) <= 2) {
+                    html += `<button class="page-btn" data-page="${i}">${i}</button>`;
+                } else if (Math.abs(i - currentPage) === 3) {
+                    html += '<span>...</span>';
+                }
+            }
+            
+            if (data.has_next) {
+                html += `<button class="page-btn" data-page="${data.next_page_number}"><i class="fas fa-chevron-right"></i></button>`;
+            }
+            
+            html += '</div></div>';
+            pagination.innerHTML = html;
+            
+            document.querySelectorAll('.page-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentPage = parseInt(btn.dataset.page);
+                    loadActivites();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        }
+        
+        // Utilitaires
+        function getTypeIcon(type) {
+            const icons = {
+                sante: '🏥', formation: '📚', culturel: '🎭',
+                sportif: '⚽', social: '🤝', environnement: '🌱',
+                citoyen: '🗳️', autre: '📌'
+            };
+            return icons[type] || '📌';
+        }
+        
+        function getTypeLabel(type) {
+            const labels = {
+                sante: 'Santé', formation: 'Formation', culturel: 'Culturel',
+                sportif: 'Sportif', social: 'Social', environnement: 'Environnement',
+                citoyen: 'Citoyen', autre: 'Autre'
+            };
+            return labels[type] || type;
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'Date à définir';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Événements
+        function setupEventListeners() {
+            const searchBtn = document.getElementById('search-btn');
+            if (searchBtn) {
+                searchBtn.addEventListener('click', () => {
+                    currentFilters.type_activite = document.getElementById('type-filter').value;
+                    currentFilters.search = document.getElementById('search-input').value;
+                    const priceFilter = document.getElementById('price-filter').value;
+                    currentFilters.est_gratuit = priceFilter === 'free' ? true : (priceFilter === 'paid' ? false : null);
+                    currentPage = 1;
+                    loadActivites();
+                });
+            }
+            
+            // Recherche par touche Entrée
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        document.getElementById('search-btn').click();
+                    }
+                });
+            }
+        }
+        
+        // Navigation mobile
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        if (navToggle) {
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+            });
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            loadActivites();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon profil - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-city"></i> Plateforme Municipale</div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/index.html">Actualités</a></li>
+                <li><a href="profile.html" class="active">Mon profil</a></li>
+                <li><a href="#" id="logout-btn">Déconnexion</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 800px; margin: 100px auto 2rem; padding: 2rem;">
+        <div class="profile-card" style="background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+            <div style="text-align: center;">
+                <img id="profile-avatar" src="" alt="Avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                <h2 id="profile-name"></h2>
+                <p id="profile-email"></p>
+            </div>
+            <div class="profile-info" style="margin-top: 2rem;">
+                <p><strong>👤 Nom d'utilisateur:</strong> <span id="profile-username"></span></p>
+                <p><strong>📅 Date d'inscription:</strong> <span id="profile-joined"></span></p>
+                <p><strong>📱 Téléphone:</strong> <span id="profile-phone"></span></p>
+                <p><strong>📍 Adresse:</strong> <span id="profile-address">Non renseignée</span></p>
+            </div>
+            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <a href="edit-profile.html" class="btn-primary" style="flex:1; text-align: center; padding: 0.75rem; background: #667eea; color: white; border-radius: 8px; text-decoration: none;">Modifier mon profil</a>
+                <a href="security.html" class="btn-secondary" style="flex:1; text-align: center; padding: 0.75rem; background: #f3f4f6; color: #374151; border-radius: 8px; text-decoration: none;">Sécurité</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/accounts';
+        const token = localStorage.getItem('auth_token');
+        
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+        
+        async function loadProfile() {
+            try {
+                const response = await fetch(`${API_BASE}/me/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const user = await response.json();
+                
+                document.getElementById('profile-name').textContent = `${user.prenom || ''} ${user.nom || ''}`.trim() || user.username;
+                document.getElementById('profile-email').textContent = user.email;
+                document.getElementById('profile-username').textContent = user.username;
+                document.getElementById('profile-joined').textContent = new Date(user.date_joined).toLocaleDateString('fr-FR');
+                document.getElementById('profile-phone').textContent = user.telephone || 'Non renseigné';
+                document.getElementById('profile-avatar').src = user.avatar_url || 'https://via.placeholder.com/100';
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+        
+        document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            window.location.href = '../../index.html';
+        });
+        
+        loadProfile();
+    </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des tournées - Admin</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .tournees-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+        .btn-add{background:#059669;color:white;padding:0.5rem 1rem;border:none;border-radius:8px;cursor:pointer}
+        .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center}
+        .modal-content{background:white;border-radius:20px;padding:2rem;max-width:500px;width:90%}
+        .form-group{margin-bottom:1rem}
+        .form-group label{display:block;margin-bottom:0.5rem}
+        .form-group input,.form-group select{width:100%;padding:0.5rem;border:1px solid #e5e7eb;border-radius:8px}
+        .admin-table th,.admin-table td{padding:0.75rem}
+        .status-planifiee{background:#fef3c7;color:#d97706;padding:0.25rem 0.5rem;border-radius:20px;font-size:0.75rem}
+        .status-terminee{background:#d1fae5;color:#059669}
+        .status-en_cours{background:#dbeafe;color:#3b82f6}
+    </style>
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <aside class="admin-sidebar">...</aside>
+        <main class="admin-main">
+            <div class="tournees-header">
+                <h1>Gestion des tournées</h1>
+                <button id="add-tournee" class="btn-add"><i class="fas fa-plus"></i> Nouvelle tournée</button>
+            </div>
+            <table class="admin-table">
+                <thead><tr><th>Date</th><th>Quartier</th><th>Agent</th><th>Points</th><th>Statut</th><th>Actions</th></tr></thead>
+                <tbody id="tournees-list"><tr><td colspan="6">Chargement...</td></tr></tbody>
+            </table>
+        </main>
+    </div>
+    
+    <div id="tournee-modal" class="modal">
+        <div class="modal-content">
+            <h3>Nouvelle tournée</h3>
+            <div class="form-group"><label>Date</label><input type="date" id="date"></div>
+            <div class="form-group"><label>Quartier</label><select id="quartier"></select></div>
+            <div class="form-group"><label>Agent</label><select id="agent"></select></div>
+            <div class="form-group"><label>Points de collecte</label><select id="points" multiple size="5"></select></div>
+            <div class="modal-buttons" style="display:flex;gap:1rem;margin-top:1rem">
+                <button id="save-tournee" class="btn-add">Créer</button>
+                <button id="close-modal" style="background:#e5e7eb;border:none;padding:0.5rem 1rem;border-radius:8px">Annuler</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000/api/dechets';
+        const token = localStorage.getItem('auth_token');
+        
+        async function loadTournees() {
+            const response = await fetch(`${API_BASE}/tournees/`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const data = await response.json();
+            const tbody = document.getElementById('tournees-list');
+            tbody.innerHTML = data.results?.map(t => `
+                <tr>
+                    <td>${new Date(t.date).toLocaleDateString('fr-FR')}</td>
+                    <td>${t.quartier_nom}</td>
+                    <td>${t.agent_nom || 'Non assigné'}</td>
+                    <td>${t.points?.length || 0}</td>
+                    <td><span class="status-${t.statut}">${t.statut}</span></td>
+                    <td><button onclick="supprimer(${t.id})" style="background:#ef4444;border:none;padding:0.25rem 0.5rem;border-radius:5px;color:white"><i class="fas fa-trash"></i></button></td>
+                </tr>`).join('') || '<tr><td colspan="6">Aucune tournée</td></tr>';
+        }
+        
+        loadTournees();
+    </script>
+</body>
+</html>

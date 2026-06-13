@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Plateforme Municipale Bot-Makak</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-blue-800 mb-8">
+            🏛️ Plateforme Municipale de Bot-Makak
+        </h1>
+        
+        <!-- Cartes récapitulatives -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="stats-cards">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="text-blue-600 text-2xl mb-2">👥</div>
+                <div class="text-3xl font-bold" id="total-users">0</div>
+                <div class="text-gray-600">Utilisateurs</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="text-green-600 text-2xl mb-2">📄</div>
+                <div class="text-3xl font-bold" id="total-actes">0</div>
+                <div class="text-gray-600">Actes d'état civil</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="text-yellow-600 text-2xl mb-2">💰</div>
+                <div class="text-3xl font-bold" id="total-paiements">0</div>
+                <div class="text-gray-600">Paiements (FCFA)</div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="text-purple-600 text-2xl mb-2">✍️</div>
+                <div class="text-3xl font-bold" id="total-signatures">0</div>
+                <div class="text-gray-600">Signatures</div>
+            </div>
+        </div>
+
+        <!-- Graphiques -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">Évolution des inscriptions</h2>
+                <canvas id="inscriptionsChart" height="200"></canvas>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4">Répartition par module</h2>
+                <canvas id="modulesChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Charger les données
+        fetch('/api/dashboard/stats/')
+            .then(response => response.json())
+            .then(data => {
+                // Mettre à jour les cartes
+                document.getElementById('total-users').textContent = data.users.total;
+                document.getElementById('total-actes').textContent = data.etat_civil.total;
+                document.getElementById('total-paiements').textContent = data.paiements.montant_total.toLocaleString();
+                document.getElementById('total-signatures').textContent = data.signatures.total;
+                
+                // Graphique d'évolution
+                const ctx = document.getElementById('inscriptionsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+                        datasets: [{
+                            label: 'Inscriptions',
+                            data: [12, 19, 15, 17, 14, 23],
+                            borderColor: '#1a237e',
+                            tension: 0.4
+                        }]
+                    }
+                });
+                
+                // Graphique de répartition
+                const ctx2 = document.getElementById('modulesChart').getContext('2d');
+                new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['État Civil', 'Activités', 'Déchets', 'Autres'],
+                        datasets: [{
+                            data: [
+                                data.etat_civil.total || 0,
+                                data.activites.total_activites || 0,
+                                data.dechets.signalements || 0,
+                                100 - (data.etat_civil.total || 0) - (data.activites.total_activites || 0) - (data.dechets.signalements || 0)
+                            ],
+                            backgroundColor: ['#1a237e', '#0d47a1', '#1565c0', '#42a5f5']
+                        }]
+                    }
+                });
+            })
+            .catch(error => console.error('Erreur:', error));
+    </script>
+</body>
+</html>

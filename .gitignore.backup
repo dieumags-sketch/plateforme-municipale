@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environnement virtuel
+venv/
+env/
+ENV/
+.venv
+
+# Fichiers statiques collectés
+staticfiles/
+static/
+
+# Fichiers médias uploadés
+media/
+uploads/
+
+# Logs
+*.log
+logs/
+
+# Base de données locale
+*.sqlite3
+*.db
+
+# Fichiers Python compilés
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Variables d'environnement
+.env
+.env.local
+
+# Fichiers de test
+.coverage
+htmlcov/
+.pytest_cache/

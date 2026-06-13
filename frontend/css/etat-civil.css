@@ -1,0 +1,465 @@
+
+/* ============================================
+   MODULE ÉTAT CIVIL - STYLES MODERNES
+   ============================================ */
+
+/* Variables */
+:root {
+    --primary: #667eea;
+    --primary-dark: #5a67d8;
+    --secondary: #764ba2;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --gray-100: #f8f9fa;
+    --gray-200: #e9ecef;
+    --gray-300: #dee2e6;
+    --gray-400: #ced4da;
+    --gray-500: #adb5bd;
+    --gray-600: #6c757d;
+    --gray-700: #495057;
+    --gray-800: #343a40;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+}
+
+/* Page Header */
+.etat-civil-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    padding: 48px 0;
+    text-align: center;
+    color: white;
+}
+
+.etat-civil-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+}
+
+.etat-civil-header h1 i {
+    margin-right: 12px;
+}
+
+.etat-civil-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Types d'actes */
+.actes-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin: -40px 24px 48px;
+    position: relative;
+    z-index: 10;
+}
+
+.acte-card {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.acte-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.acte-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.acte-card:hover::before {
+    transform: scaleX(1);
+}
+
+.acte-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.acte-icon i {
+    font-size: 40px;
+    color: var(--primary);
+}
+
+.acte-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    color: var(--gray-800);
+}
+
+.acte-card p {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+/* Formulaires */
+.form-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px;
+}
+
+.form-card {
+    background: white;
+    border-radius: 24px;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-md);
+}
+
+.form-section {
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--gray-200);
+    padding-bottom: 24px;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.form-section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-section-title i {
+    font-size: 1.3rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--gray-700);
+}
+
+.form-group label .required {
+    color: var(--danger);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+}
+
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+    border-color: var(--danger);
+}
+
+.error-message {
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Navigation formulaire */
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--gray-200);
+}
+
+.btn-prev, .btn-next, .btn-submit {
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+}
+
+.btn-prev {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.btn-prev:hover {
+    background: var(--gray-300);
+}
+
+.btn-next, .btn-submit {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+}
+
+.btn-next:hover, .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Stepper */
+.stepper {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    position: relative;
+}
+
+.stepper::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gray-200);
+    z-index: 1;
+}
+
+.step {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    flex: 1;
+}
+
+.step-number {
+    width: 48px;
+    height: 48px;
+    background: white;
+    border: 2px solid var(--gray-300);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.step.active .step-number {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-color: transparent;
+    color: white;
+}
+
+.step.completed .step-number {
+    background: var(--success);
+    border-color: transparent;
+    color: white;
+}
+
+.step.completed .step-number i {
+    font-size: 20px;
+}
+
+.step-label {
+    font-size: 12px;
+    color: var(--gray-600);
+}
+
+.step.active .step-label {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Demandes list */
+.demandes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.demande-item {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    border-left: 4px solid;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s;
+}
+
+.demande-item:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.demande-statut {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.statut-en_attente { background: #fef3c7; color: #d97706; border-left-color: #f59e0b; }
+.statut-en_cours { background: #e0e7ff; color: #4f46e5; border-left-color: #6366f1; }
+.statut-valide { background: #d1fae5; color: #059669; border-left-color: #10b981; }
+.statut-rejete { background: #fee2e2; color: #dc2626; border-left-color: #ef4444; }
+.statut-delivre { background: #d1fae5; color: #059669; border-left-color: #10b981; }
+
+/* Timeline suivi */
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.timeline-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--gray-100);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.timeline-icon.completed {
+    background: var(--success);
+    color: white;
+}
+
+.timeline-icon.active {
+    background: var(--primary);
+    color: white;
+}
+
+.timeline-content {
+    flex: 1;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.timeline-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.timeline-date {
+    font-size: 12px;
+    color: var(--gray-500);
+}
+
+.timeline-description {
+    font-size: 13px;
+    color: var(--gray-600);
+    margin-top: 8px;
+}
+
+/* QR Code */
+.qrcode-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.qrcode {
+    width: 200px;
+    height: 200px;
+    background: white;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    margin: 0 auto 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .actes-types-grid {
+        margin: -30px 16px 32px;
+        gap: 16px;
+    }
+    
+    .form-container {
+        padding: 16px;
+    }
+    
+    .form-card {
+        padding: 20px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .stepper {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    
+    .stepper::before {
+        display: none;
+    }
+    
+    .step {
+        flex: none;
+        width: calc(33.33% - 16px);
+    }
+    
+    .btn-prev, .btn-next, .btn-submit {
+        padding: 12px 20px;
+    }
+}

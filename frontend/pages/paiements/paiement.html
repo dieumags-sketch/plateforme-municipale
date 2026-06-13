@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effectuer un paiement - Commune Bot-Makak</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <link rel="stylesheet" href="../../css/modules/paiements.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-city"></i><span>Plateforme Municipale</span></div>
+            <div class="nav-toggle" id="navToggle"><i class="fas fa-bars"></i></div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/">Actualités</a></li>
+                <li><a href="../annuaires/">Annuaires</a></li>
+                <li><a href="../dechets/">Déchets</a></li>
+                <li><a href="../activites/">Activités</a></li>
+                <li><a href="../accounts/login.html" class="btn-login"><i class="fas fa-user"></i> Connexion</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="paiements-header">
+        <h1><i class="fas fa-credit-card"></i> Effectuer un paiement</h1>
+        <p>Payez vos services municipaux en toute sécurité</p>
+    </div>
+
+    <!-- Mode de paiement -->
+    <div class="modes-grid">
+        <div class="mode-card mtn" data-mode="mtn">
+            <div class="mode-icon"><i class="fas fa-phone-alt"></i></div>
+            <h3>MTN Mobile Money</h3>
+            <p>Paiement instantané via MTN</p>
+            <small>Frais: 0-1%</small>
+        </div>
+        <div class="mode-card orange" data-mode="orange">
+            <div class="mode-icon"><i class="fas fa-phone-alt"></i></div>
+            <h3>Orange Money</h3>
+            <p>Paiement instantané via Orange</p>
+            <small>Frais: 0-1%</small>
+        </div>
+        <div class="mode-card virement" data-mode="virement">
+            <div class="mode-icon"><i class="fas fa-university"></i></div>
+            <h3>Virement bancaire</h3>
+            <p>Transfert bancaire sécurisé</p>
+            <small>Délai: 24-48h</small>
+        </div>
+        <div class="mode-card cash" data-mode="cash">
+            <div class="mode-icon"><i class="fas fa-money-bill-wave"></i></div>
+            <h3>Cash physique</h3>
+            <p>Paiement en mairie</p>
+            <small>Horaires: 8h-16h</small>
+        </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="paiement-form-container">
+        <div class="form-card">
+            <div class="montant-card">
+                <div class="label">Montant à payer</div>
+                <div class="valeur"><span id="montantDisplay">0</span> FCFA</div>
+            </div>
+            
+            <form id="paiementForm">
+                <div class="form-group">
+                    <label>Service concerné <span class="required">*</span></label>
+                    <select id="moduleSource" class="filter-select" required>
+                        <option value="">Sélectionnez un service</option>
+                        <option value="etat_civil">🏛️ État Civil</option>
+                        <option value="activites">🎯 Activités municipales</option>
+                        <option value="dechets">🗑️ Gestion des déchets</option>
+                        <option value="archives">📚 Archives municipales</option>
+                        <option value="amendes">⚠️ Amendes</option>
+                        <option value="taxes">🏠 Taxes municipales</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Référence de la demande (optionnel)</label>
+                    <input type="text" id="sourceId" class="search-input" placeholder="Ex: NAISS-2024-001">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Montant (FCFA) <span class="required">*</span></label>
+                        <input type="number" id="montant" class="search-input" placeholder="0" step="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="description" class="search-input" placeholder="Motif du paiement">
+                    </div>
+                </div>
+                
+                <div id="phoneInput" class="form-group" style="display: none;">
+                    <label>Numéro de téléphone Mobile Money <span class="required">*</span></label>
+                    <div class="phone-input-group">
+                        <select id="operateur" style="width: 100px;">
+                            <option value="mtn">MTN</option>
+                            <option value="orange">Orange</option>
+                        </select>
+                        <input type="tel" id="telephone" class="search-input" placeholder="6XXXXXXXX" style="flex: 1;">
+                    </div>
+                    <small>Vous recevrez un code de validation par SMS</small>
+                </div>
+                
+                <div id="bankInfo" class="bank-info" style="display: none;">
+                    <div class="bank-header">
+                        <i class="fas fa-university"></i>
+                        <h4>Coordonnées bancaires</h4>
+                    </div>
+                    <div class="bank-details">
+                        <p><strong>🏦 Banque:</strong> BICEC</p>
+                        <p><strong>👤 Titulaire:</strong> Commune de Bot-Makak</p>
+                        <p><strong>🔢 RIB:</strong> CM21 1000 0000 0000 0000 0000 000</p>
+                        <p><strong>🌍 IBAN:</strong> CM21 1000 0000 0000 0000 0000 000</p>
+                        <p><strong>⚡ BIC:</strong> CMCICMCX</p>
+                    </div>
+                    <div class="bank-note">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Après virement, uploadez votre preuve ci-dessous</span>
+                    </div>
+                </div>
+                
+                <div id="uploadSection" class="form-group" style="display: none;">
+                    <label>Preuve de virement (PDF, JPG, PNG)</label>
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Glissez-déposez votre fichier ici ou cliquez pour sélectionner</p>
+                        <input type="file" id="preuveVirement" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                        <span id="fileName" class="file-name"></span>
+                    </div>
+                </div>
+                
+                <div id="cashInfo" class="cash-info" style="display: none;">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>Paiement en espèces</strong><br>
+                        Rendez-vous à la mairie de Bot-Makak<br>
+                        Bureau du receveur municipal<br>
+                        <strong>Horaires:</strong> Lundi-Vendredi, 8h00 - 16h00
+                    </div>
+                </div>
+                
+                <div class="recap-section" id="recapSection" style="display: none;">
+                    <h4>Récapitulatif</h4>
+                    <div class="recap-line">
+                        <span>Montant net:</span>
+                        <span id="recapNet">0 FCFA</span>
+                    </div>
+                    <div class="recap-line">
+                        <span>Frais:</span>
+                        <span id="recapFrais">0 FCFA</span>
+                    </div>
+                    <div class="recap-line total">
+                        <span>Total à payer:</span>
+                        <span id="recapTotal">0 FCFA</span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-primary" id="submitBtn" style="width: 100%; margin-top: 24px;">
+                    <i class="fas fa-lock"></i> Payer maintenant
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal code de validation -->
+    <div id="codeModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Code de validation</h2>
+                <button class="modal-close" onclick="closeCodeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Un code de validation a été envoyé par SMS au <strong id="codePhone"></strong></p>
+                <div class="form-group">
+                    <label>Code à 6 chiffres</label>
+                    <input type="text" id="validationCode" class="search-input" placeholder="000000" maxlength="6" style="text-align: center; font-size: 24px; letter-spacing: 5px;">
+                </div>
+                <div class="code-timer" id="codeTimer"></div>
+                <button class="btn-primary" onclick="confirmerCode()" style="width: 100%;">Confirmer</button>
+                <button class="btn-secondary" onclick="renvoyerCode()" style="width: 100%; margin-top: 12px;">Renvoyer le code</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/api.js"></script>
+    <script src="../../js/modules/paiements.js"></script>
+</body>
+</html>

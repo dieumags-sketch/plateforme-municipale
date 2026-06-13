@@ -1,0 +1,186 @@
+/* ============================================
+   STYLES COMPLÉMENTAIRES
+   ============================================ */
+
+/* Phone input group */
+.phone-input-group {
+    display: flex;
+    gap: 12px;
+}
+
+.phone-input-group select {
+    width: 100px;
+    padding: 12px;
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    background: white;
+}
+
+/* Upload area */
+.upload-area {
+    border: 2px dashed var(--gray-300);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.upload-area:hover, .upload-area.dragover {
+    border-color: var(--primary);
+    background: rgba(102,126,234,0.05);
+}
+
+.upload-area i {
+    font-size: 48px;
+    color: var(--primary);
+    margin-bottom: 16px;
+}
+
+.upload-area p {
+    color: var(--gray-600);
+    font-size: 14px;
+}
+
+.file-name {
+    display: block;
+    margin-top: 12px;
+    color: var(--success);
+    font-size: 13px;
+}
+
+/* Cash info */
+.cash-info {
+    background: #f0fdf4;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.cash-info i {
+    font-size: 32px;
+    color: #10b981;
+}
+
+/* Recap section */
+.recap-section {
+    background: var(--gray-100);
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.recap-section h4 {
+    margin-bottom: 16px;
+    color: var(--primary);
+}
+
+.recap-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 4px 0;
+}
+
+.recap-line.total {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray-300);
+    font-size: 16px;
+}
+
+/* Transaction item */
+.transaction-item {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+    border-left: 4px solid;
+    margin-bottom: 12px;
+}
+
+.transaction-info .reference {
+    font-size: 12px;
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.transaction-info .montant {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.transaction-info .date {
+    font-size: 11px;
+    color: var(--gray-500);
+}
+
+.transaction-details {
+    text-align: right;
+}
+
+.transaction-statut {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.transaction-details .mode {
+    font-size: 12px;
+    color: var(--gray-600);
+}
+
+/* Modal timer */
+.code-timer {
+    text-align: center;
+    margin: 16px 0;
+    font-size: 14px;
+    color: var(--gray-600);
+}
+
+/* Animations */
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .transaction-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .transaction-details {
+        text-align: center;
+        margin-top: 12px;
+    }
+    
+    .phone-input-group {
+        flex-direction: column;
+    }
+    
+    .phone-input-group select {
+        width: 100%;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+}

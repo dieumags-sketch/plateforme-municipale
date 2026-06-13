@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Archives - Commune Bot-Makak</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #6d28d9;
+            --secondary: #7c3aed;
+        }
+        
+        .archives-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 60px 0;
+            text-align: center;
+            color: white;
+        }
+        
+        .archives-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 16px;
+        }
+        
+        .archives-header h1 i {
+            margin-right: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 60px;
+        }
+        
+        .search-archives {
+            background: white;
+            border-radius: 60px;
+            padding: 8px;
+            display: flex;
+            max-width: 600px;
+            margin: -30px auto 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .search-archives input {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+        }
+        
+        .search-archives button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .categories-pills {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+        
+        .pill {
+            padding: 8px 20px;
+            background: white;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .pill.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .archives-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        
+        .archive-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .archive-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .archive-icon {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .archives-header h1 { font-size: 2rem; }
+            .search-archives { margin: -20px 16px 30px; }
+            .archives-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-city"></i>
+                <span>Plateforme Municipale</span>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/">Actualités</a></li>
+                <li><a href="../annuaires/">Annuaires</a></li>
+                <li><a href="../dechets/">Gestion des déchets</a></li>
+                <li><a href="../activites/">Activités</a></li>
+                <li><a href="../accounts/login.html" class="btn-login"><i class="fas fa-user"></i> Connexion</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header Archives -->
+    <div class="archives-header">
+        <h1><i class="fas fa-archive"></i> Archives municipales de Bot-Makak</h1>
+        <p>Consultez l'histoire de votre commune</p>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="actes-section" style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+        <div class="search-archives">
+            <input type="text" placeholder="🔍 Rechercher par titre, référence, date...">
+            <button><i class="fas fa-search"></i> Rechercher</button>
+        </div>
+
+        <div class="categories-pills">
+            <div class="pill active">📄 Tous</div>
+            <div class="pill">🏛️ Délibérations</div>
+            <div class="pill">⚖️ Arrêtés</div>
+            <div class="pill">🏗️ Urbanisme</div>
+            <div class="pill">👥 État civil</div>
+            <div class="pill">📸 Photos historiques</div>
+        </div>
+
+        <div class="archives-grid" id="archivesGrid">
+            <!-- Les archives seront chargées dynamiquement -->
+            <div class="archive-card">
+                <div class="archive-icon"><i class="fas fa-file-pdf"></i></div>
+                <h3>Délibération 2024-001</h3>
+                <p>Budget primitif 2024</p>
+                <small>Date: 15/01/2024</small>
+            </div>
+            <div class="archive-card">
+                <div class="archive-icon"><i class="fas fa-file-alt"></i></div>
+                <h3>Arrêté municipal 2023-089</h3>
+                <p>Réglementation stationnement</p>
+                <small>Date: 10/12/2023</small>
+            </div>
+            <div class="archive-card">
+                <div class="archive-icon"><i class="fas fa-map"></i></div>
+                <h3>Plan d'urbanisme 2020-2030</h3>
+                <p>Document d'urbanisme</p>
+                <small>Date: 05/03/2020</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Plateforme Municipale</h3>
+                <p>Votre mairie en ligne, accessible 24h/24</p>
+            </div>
+            <div class="footer-section">
+                <h4>Liens utiles</h4>
+                <ul>
+                    <li><a href="#">Mentions légales</a></li>
+                    <li><a href="#">Politique de confidentialité</a></li>
+                    <li><a href="#">CGU</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Suivez-nous</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Plateforme Municipale - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <script src="../../js/main.js"></script>
+    <script src="../../js/api.js"></script>
+    <script>
+        // Gestion des onglets catégories
+        document.querySelectorAll('.pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                // Ici, charger les archives par catégorie
+            });
+        });
+        
+        // Navigation mobile
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        if (navToggle) {
+            navToggle.addEventListener('click', () => {
+                navToggle.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+        }
+    </script>
+</body>
+</html>

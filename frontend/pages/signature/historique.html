@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique des signatures - Commune Bot-Makak</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <link rel="stylesheet" href="../../css/modules/signature.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">[MENU]</nav>
+
+    <div class="signature-header">
+        <h1><i class="fas fa-history"></i> Historique des signatures</h1>
+        <p>Retrouvez toutes vos signatures électroniques</p>
+    </div>
+
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-section-title"><i class="fas fa-filter"></i> Filtrer</div>
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label>Module</label>
+                    <select id="moduleFilter" class="filter-select">
+                        <option value="">Tous</option>
+                        <option value="etat_civil">État Civil</option>
+                        <option value="archives">Archives</option>
+                        <option value="activites">Activités</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Période</label>
+                    <select id="periodeFilter" class="filter-select">
+                        <option value="all">Toutes</option>
+                        <option value="week">7 derniers jours</option>
+                        <option value="month">30 derniers jours</option>
+                        <option value="year">12 derniers mois</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Statut</label>
+                    <select id="statutFilter" class="filter-select">
+                        <option value="all">Tous</option>
+                        <option value="valide">Valides</option>
+                        <option value="invalide">Invalides</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filters-actions">
+                <button class="btn-secondary" onclick="resetFilters()">Réinitialiser</button>
+                <button class="btn-primary" onclick="applyFilters()">Appliquer</button>
+            </div>
+        </div>
+
+        <div class="form-card" style="margin-top: 24px;">
+            <div class="form-section-title"><i class="fas fa-list"></i> Mes signatures</div>
+            <div id="historiqueList" class="demandes-list">
+                <div class="loading-container"><div class="spinner"></div><p>Chargement...</p></div>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Détail de la signature</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="detailModalBody"></div>
+        </div>
+    </div>
+
+    <script src="../../js/api.js"></script>
+    <script src="../../js/modules/signature.js"></script>
+</body>
+</html>

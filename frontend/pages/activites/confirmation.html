@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .confirmation-container { max-width: 500px; margin: 120px auto 2rem; background: white; padding: 2rem; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .check-icon { width: 80px; height: 80px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }
+        .check-icon i { font-size: 3rem; color: white; }
+        .btn-primary { display: inline-block; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 12px; text-decoration: none; margin-top: 1rem; }
+        .reference { background: #f3f4f6; padding: 1rem; border-radius: 12px; font-family: monospace; margin: 1rem 0; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-city"></i> Plateforme Municipale</div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/index.html">Actualités</a></li>
+                <li><a href="index.html">Activités</a></li>
+                <li><a href="mes-inscriptions.html">Mes inscriptions</a></li>
+                <li><a href="../accounts/profile.html">Mon compte</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="confirmation-container">
+        <div class="check-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <h2>Inscription confirmée !</h2>
+        <p>Votre inscription à l'activité a bien été enregistrée.</p>
+        <div class="reference" id="reference"></div>
+        <div id="qr-container"></div>
+        <a href="mes-inscriptions.html" class="btn-primary">Voir mes inscriptions</a>
+        <br><br>
+        <a href="index.html" style="color: #667eea;">← Retour aux activités</a>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const ref = urlParams.get('ref');
+        const qr = urlParams.get('qr');
+        
+        document.getElementById('reference').innerHTML = `<strong>Référence :</strong> ${ref || 'Non disponible'}`;
+        if (qr) {
+            document.getElementById('qr-container').innerHTML = `<img src="data:image/png;base64,${qr}" style="margin: 1rem auto; border: 2px solid #e5e7eb; border-radius: 12px; padding: 0.5rem;">`;
+        }
+    </script>
+</body>
+</html>

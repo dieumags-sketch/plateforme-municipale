@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vérification 2FA - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-city"></i>
+                    <span>Plateforme Municipale</span>
+                </div>
+                <h1>Authentification à deux facteurs</h1>
+                <p>Entrez le code généré par votre application</p>
+            </div>
+
+            <form id="2fa-form">
+                <div class="form-group" style="text-align: center;">
+                    <label><i class="fas fa-shield-alt"></i> Code de vérification</label>
+                    <input type="text" id="totp-code" maxlength="6" placeholder="000000" style="width: 200px; text-align: center; font-size: 1.5rem; letter-spacing: 5px; margin: 0 auto; display: block;">
+                </div>
+                <button type="submit" class="btn-auth" style="width: 100%;">Vérifier</button>
+            </form>
+
+            <div class="auth-footer" style="margin-top: 1rem; text-align: center;">
+                <a href="login.html">← Retour à la connexion</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/accounts';
+        
+        // Récupérer les identifiants temporaires stockés
+        const tempEmail = sessionStorage.getItem('2fa_temp_email');
+        const tempPassword = sessionStorage.getItem('2fa_temp_password');
+        
+        if (!tempEmail) {
+            window.location.href = 'login.html';
+        }
+        
+        document.getElementById('2fa-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const totpCode = document.getElementById('totp-code').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/login/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: tempEmail,
+                        password: tempPassword,
+                        totp_code: totpCode
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    localStorage.setItem('auth_token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    sessionStorage.removeItem('2fa_temp_email');
+                    sessionStorage.removeItem('2fa_temp_password');
+                    window.location.href = '../../index.html';
+                } else {
+                    alert(data.error || 'Code invalide');
+                }
+            } catch (error) {
+                alert('Erreur de connexion');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription à l'activité - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .inscription-form { max-width: 600px; margin: 120px auto 2rem; background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 1rem; }
+        .form-group input:focus { outline: none; border-color: #667eea; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .btn-primary { width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .loading-spinner { text-align: center; padding: 2rem; }
+        .toast-notification { position: fixed; bottom: 20px; right: 20px; padding: 1rem 1.5rem; border-radius: 12px; color: white; z-index: 9999; }
+        .toast-success { background: #10b981; }
+        .toast-error { background: #ef4444; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-city"></i> Plateforme Municipale</div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/index.html">Actualités</a></li>
+                <li><a href="index.html">Activités</a></li>
+                <li><a href="mes-inscriptions.html">Mes inscriptions</a></li>
+                <li><a href="../accounts/profile.html">Mon compte</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="inscription-form">
+        <h2>Inscription à l'activité</h2>
+        <div id="activite-info" style="background: #f3f4f6; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;"></div>
+        
+        <form id="inscription-form">
+            <input type="hidden" id="activite_id">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nom complet *</label>
+                    <input type="text" id="nom_complet" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="email" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Téléphone *</label>
+                    <input type="tel" id="telephone" required>
+                </div>
+                <div class="form-group">
+                    <label>Date de naissance</label>
+                    <input type="date" id="date_naissance">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Adresse</label>
+                <textarea id="adresse" rows="2"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre de places *</label>
+                    <input type="number" id="nombre_places" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Noms des accompagnants</label>
+                    <input type="text" id="noms_accompagnants" placeholder="Séparés par des virgules">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Commentaire</label>
+                <textarea id="commentaire" rows="2" placeholder="Informations supplémentaires..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary">Confirmer l'inscription</button>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/activites';
+        const token = localStorage.getItem('auth_token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!token) window.location.href = '../accounts/login.html';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const activiteId = urlParams.get('id');
+        if (!activiteId) window.location.href = 'index.html';
+        
+        document.getElementById('activite_id').value = activiteId;
+        document.getElementById('nom_complet').value = user.full_name || `${user.prenom || ''} ${user.nom || ''}`.trim();
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('telephone').value = user.telephone || '';
+        
+        async function loadActiviteInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/activites/${activiteId}/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const act = await response.json();
+                document.getElementById('activite-info').innerHTML = `
+                    <strong>${escapeHtml(act.titre)}</strong><br>
+                    📅 ${new Date(act.date_debut).toLocaleDateString('fr-FR')}<br>
+                    📍 ${escapeHtml(act.lieu)}<br>
+                    💰 ${act.est_gratuit ? 'GRATUIT' : `${parseInt(act.prix).toLocaleString()} FCFA`}
+                `;
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+        
+        document.getElementById('inscription-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombrePlaces = parseInt(document.getElementById('nombre_places').value);
+            
+            const formData = {
+                activite: parseInt(activiteId),
+                nom_complet: document.getElementById('nom_complet').value,
+                email: document.getElementById('email').value,
+                telephone: document.getElementById('telephone').value,
+                date_naissance: document.getElementById('date_naissance').value,
+                adresse: document.getElementById('adresse').value,
+                commentaire: document.getElementById('commentaire').value,
+                nombre_places: nombrePlaces,
+                noms_accompagnants: document.getElementById('noms_accompagnants').value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/inscriptions/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    if (data.montant_total > 0) {
+                        window.location.href = `paiement.html?id=${data.id}&montant=${data.montant_total}`;
+                    } else {
+                        showToast('Inscription confirmée !', 'success');
+                        setTimeout(() => { window.location.href = 'mes-inscriptions.html'; }, 1500);
+                    }
+                } else {
+                    showToast(data.error || 'Erreur lors de l\'inscription', 'error');
+                }
+            } catch (error) {
+                showToast('Erreur de connexion', 'error');
+            }
+        });
+        
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        loadActiviteInfo();
+    </script>
+</body>
+</html>

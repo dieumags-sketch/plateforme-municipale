@@ -1,0 +1,117 @@
+# ============================================
+# PYTHON
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.dll
+*.dylib
+.Python
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+*.egg
+
+# ============================================
+# ENVIRONNEMENT VIRTUEL
+# ============================================
+venv/
+env/
+ENV/
+.venv
+.env
+.venv/
+venv/
+env/
+
+# ============================================
+# DJANGO
+# ============================================
+*.log
+*.pot
+*.pyc
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+static/
+media/
+uploads/
+mediafiles/
+
+# ============================================
+# FICHIERS DE CONFIGURATION
+# ============================================
+.env
+.env.local
+.env.production
+.env.development
+.secrets
+config/secrets.yml
+
+# ============================================
+# IDEs ET ÉDITEURS
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.desktop.ini
+*.sublime-*
+.project
+.pydevproject
+
+# ============================================
+# TESTS ET COUVERTURE
+# ============================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+coverage.xml
+*.cover
+
+# ============================================
+# LOGS ET TEMPORAIRES
+# ============================================
+logs/
+*.log
+tmp/
+temp/
+*.tmp
+*.bak
+*.old
+
+# ============================================
+# DÉPENDANCES (gérées via requirements.txt)
+# ============================================
+node_modules/
+bower_components/
+package-lock.json
+yarn.lock
+
+# ============================================
+# FICHIERS DE PROJET SPÉCIFIQUES
+# ============================================
+# Fichiers uploadés
+backend/media/
+backend/staticfiles/
+
+# Rapports
+*.pdf
+*.xlsx
+*.docx
+
+# Fichiers de données
+*.sql
+*.dump
+.git.backup/

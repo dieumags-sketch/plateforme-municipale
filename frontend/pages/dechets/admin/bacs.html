@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des bacs - Admin</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/admin.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .bacs-container{display:flex;gap:1.5rem}
+        .bacs-list{flex:1;background:white;border-radius:16px;padding:1rem}
+        .bacs-map{flex:2;background:white;border-radius:16px;padding:1rem}
+        #map{height:500px;border-radius:12px}
+        .bac-item{padding:0.75rem;border-bottom:1px solid #e5e7eb;cursor:pointer}
+        .bac-item:hover{background:#f9fafb}
+        .bac-status{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:0.5rem}
+        .status-actif{background:#059669}
+        .status-plein{background:#ef4444}
+        .status-casse{background:#f59e0b}
+    </style>
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <aside class="admin-sidebar">...</aside>
+        <main class="admin-main">
+            <h1>Gestion des points de collecte</h1>
+            <div class="bacs-container">
+                <div class="bacs-list">
+                    <h3>Liste des bacs</h3>
+                    <div id="bacs-list">Chargement...</div>
+                    <button id="add-bac" style="margin-top:1rem;background:#059669;color:white;border:none;padding:0.5rem;border-radius:8px;width:100%">+ Ajouter un bac</button>
+                </div>
+                <div class="bacs-map">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:8000/api/dechets';
+        const token = localStorage.getItem('auth_token');
+        let map, markers = [];
+        
+        async function loadBacs() {
+            const response = await fetch(`${API_BASE}/points/`, { headers: { 'Authorization': `Bearer ${token}` } });
+            const bacs = await response.json();
+            
+            document.getElementById('bacs-list').innerHTML = bacs.map(b => `
+                <div class="bac-item" onclick="centrerCarte(${b.latitude},${b.longitude})">
+                    <span class="bac-status status-${b.statut}"></span>
+                    <strong>${b.code}</strong> - ${b.adresse_reference}<br>
+                    <small>${b.type} | ${b.statut} | Dernier vidage: ${b.dernier_vidage ? new Date(b.dernier_vidage).toLocaleDateString() : 'N/A'}</small>
+                </div>
+            `).join('');
+            
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+            bacs.forEach(b => {
+                if (b.latitude && b.longitude) {
+                    const couleur = b.statut === 'actif' ? '#059669' : (b.statut === 'plein' ? '#ef4444' : '#f59e0b');
+                    const marker = L.marker([b.latitude, b.longitude])
+                        .bindPopup(`<b>${b.code}</b><br>${b.adresse_reference}<br>Statut: ${b.statut}`)
+                        .addTo(map);
+                    markers.push(marker);
+                }
+            });
+        }
+        
+        function initMap() {
+            map = L.map('map').setView([4.05, 9.77], 13);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+        }
+        
+        function centrerCarte(lat, lng) { map.setView([lat, lng], 18); }
+        
+        initMap();
+        loadBacs();
+    </script>
+</body>
+</html>

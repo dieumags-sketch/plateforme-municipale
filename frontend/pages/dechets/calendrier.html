@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendrier des collectes - Bot-Makak</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .container{max-width:800px;margin:100px auto 2rem;padding:2rem}
+        .quartier-selector{margin-bottom:2rem}
+        select{width:100%;padding:0.75rem;border:2px solid #e5e7eb;border-radius:12px;font-size:1rem}
+        .calendar-card{background:white;border-radius:20px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 4px 6px rgba(0,0,0,0.05)}
+        .day{font-weight:bold;color:#059669;margin-bottom:0.5rem}
+        .hour{font-size:1.5rem;font-weight:bold}
+        .rappel-btn{background:#059669;color:white;border:none;padding:0.5rem 1rem;border-radius:20px;margin-top:0.5rem;cursor:pointer}
+        .prochain{background:#f0fdf4;border-left:4px solid #059669}
+        .loading{text-align:center;padding:2rem}
+    </style>
+</head>
+<body>
+    <nav class="navbar">...</nav>
+    
+    <div class="container">
+        <h1><i class="fas fa-calendar-alt"></i> Calendrier des collectes</h1>
+        
+        <div class="quartier-selector">
+            <label>Choisissez votre quartier :</label>
+            <select id="quartier-select">
+                <option value="">Chargement...</option>
+            </select>
+        </div>
+        
+        <div id="calendar-container"></div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000/api/dechets';
+        
+        async function loadQuartiers() {
+            const response = await fetch(`${API_BASE}/quartiers/`);
+            const quartiers = await response.json();
+            const select = document.getElementById('quartier-select');
+            select.innerHTML = '<option value="">Sélectionnez un quartier</option>';
+            quartiers.forEach(q => {
+                select.innerHTML += `<option value="${q.id}">${q.nom}</option>`;
+            });
+        }
+        
+        async function loadCalendrier(quartierId) {
+            const container = document.getElementById('calendar-container');
+            container.innerHTML = '<div class="loading">Chargement...</div>';
+            
+            const response = await fetch(`${API_BASE}/calendrier/?quartier=${quartierId}`);
+            const data = await response.json();
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="loading">Aucun horaire pour ce quartier</div>';
+                return;
+            }
+            
+            const jours = {0:'Lundi',1:'Mardi',2:'Mercredi',3:'Jeudi',4:'Vendredi',5:'Samedi',6:'Dimanche'};
+            const aujourdhui = new Date().getDay();
+            
+            container.innerHTML = data.map(c => {
+                const isProchain = c.jour_semaine === aujourdhui || 
+                    (c.jour_semaine > aujourdhui && c.jour_semaine - aujourdhui <= 2);
+                return `
+                    <div class="calendar-card ${isProchain ? 'prochain' : ''}">
+                        <div class="day">📅 ${jours[c.jour_semaine]}</div>
+                        <div class="hour">🕐 ${c.heure_passage}</div>
+                        <button class="rappel-btn" onclick="activerRappel('${c.quartier_nom}')">
+                            <i class="fas fa-bell"></i> Rappel la veille
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function activerRappel(quartierNom) {
+            if (Notification.permission === 'granted') {
+                new Notification(`Rappel activé pour ${quartierNom}`, {
+                    body: 'Vous serez notifié la veille des collectes'
+                });
+            }
+            localStorage.setItem('rappel_quartier_nom', quartierNom);
+            alert(`Rappels activés pour ${quartierNom}`);
+        }
+        
+        document.getElementById('quartier-select').addEventListener('change', (e) => {
+            if (e.target.value) loadCalendrier(e.target.value);
+        });
+        
+        loadQuartiers();
+    </script>
+</body>
+</html>

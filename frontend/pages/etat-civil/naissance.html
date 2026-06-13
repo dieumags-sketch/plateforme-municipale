@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Déclaration de naissance - Commune Bot-Makak</title>
+    
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* Variables identiques à la page d'accueil */
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+        
+        /* Header identique */
+        .etat-civil-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 60px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .etat-civil-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .etat-civil-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 250px;
+            height: 250px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, 20px); }
+        }
+        
+        .etat-civil-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .etat-civil-header h1 i {
+            margin-right: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 60px;
+        }
+        
+        .etat-civil-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Formulaire container */
+        .form-container {
+            max-width: 1200px;
+            margin: -30px auto 0;
+            padding: 0 24px 60px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        /* Stepper amélioré */
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 48px;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 24px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gray-200);
+            z-index: 1;
+        }
+        
+        .step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+            min-width: 80px;
+        }
+        
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: white;
+            border: 2px solid var(--gray-300);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-number {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .step.completed .step-number {
+            background: var(--success);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .step.completed .step-number i {
+            font-size: 20px;
+        }
+        
+        .step-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+        
+        .step.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        /* Form steps */
+        .form-step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .form-step.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 28px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .form-section-title i {
+            font-size: 1.4rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+        
+        .form-group label .required {
+            color: var(--danger);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 14px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        
+        .form-group input.error,
+        .form-group select.error {
+            border-color: var(--danger);
+        }
+        
+        /* Checkbox */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 12px;
+            background: var(--gray-100);
+            border-radius: 14px;
+            margin-top: 16px;
+        }
+        
+        .checkbox-label input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        /* Navigation buttons */
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .btn-prev, .btn-next, .btn-submit {
+            padding: 14px 32px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 14px;
+        }
+        
+        .btn-prev {
+            background: var(--gray-200);
+            color: var(--gray-700);
+        }
+        
+        .btn-prev:hover {
+            background: var(--gray-300);
+            transform: translateX(-2px);
+        }
+        
+        .btn-next, .btn-submit {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-next:hover, .btn-submit:hover {
+            transform: translateX(2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Récapitulatif */
+        .recapitulatif {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .recap-section {
+            background: var(--gray-100);
+            padding: 20px;
+            border-radius: 20px;
+        }
+        
+        .recap-section h4 {
+            color: var(--primary);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--gray-300);
+        }
+        
+        .recap-section p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+            padding: 20px;
+            border-radius: 20px;
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        
+        .info-box i {
+            font-size: 28px;
+            color: var(--primary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .etat-civil-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .form-container {
+                padding: 0 16px 40px;
+            }
+            
+            .form-card {
+                padding: 24px;
+            }
+            
+            .stepper {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .stepper::before {
+                display: none;
+            }
+            
+            .step {
+                min-width: 70px;
+            }
+            
+            .form-section-title {
+                font-size: 1.1rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .form-navigation {
+                flex-direction: column;
+            }
+            
+            .btn-prev, .btn-next, .btn-submit {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .recapitulatif {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-box {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .step-label {
+                font-size: 10px;
+            }
+            
+            .step-number {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation identique à l'accueil -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-city"></i>
+                <span>Plateforme Municipale</span>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/">Actualités</a></li>
+                <li><a href="../annuaires/">Annuaires</a></li>
+                <li><a href="../dechets/">Gestion des déchets</a></li>
+                <li><a href="../activites/">Activités</a></li>
+                <li><a href="../accounts/login.html" class="btn-login"><i class="fas fa-user"></i> Connexion</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="etat-civil-header">
+        <h1><i class="fas fa-baby-carriage"></i> Déclaration de naissance</h1>
+        <p>Formulaire de déclaration de naissance - Remplissez toutes les sections</p>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="form-container">
+        <div class="form-card">
+            <!-- Stepper -->
+            <div class="stepper" id="stepper">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">📍 Géographique</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">👶 Enfant</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">👩 Mère</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">👨 Père</div>
+                </div>
+                <div class="step" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">✍️ Déclarant</div>
+                </div>
+                <div class="step" data-step="6">
+                    <div class="step-number">6</div>
+                    <div class="step-label">✅ Récap</div>
+                </div>
+            </div>
+
+            <form id="naissanceForm">
+                <!-- Step 1 - Informations géographiques -->
+                <div id="step1" class="form-step active">
+                    <div class="form-section-title"><i class="fas fa-map-marker-alt"></i> Informations géographiques</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Région <span class="required">*</span></label>
+                            <select id="region" required>
+                                <option value="">Sélectionnez une région</option>
+                                <option value="1">Adamaoua</option><option value="2">Centre</option>
+                                <option value="3">Est</option><option value="4">Extrême-Nord</option>
+                                <option value="5">Littoral</option><option value="6">Nord</option>
+                                <option value="7">Nord-Ouest</option><option value="8">Ouest</option>
+                                <option value="9">Sud</option><option value="10">Sud-Ouest</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Département <span class="required">*</span></label>
+                            <select id="departement" required disabled>
+                                <option value="">Sélectionnez d'abord une région</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Arrondissement <span class="required">*</span></label>
+                            <select id="arrondissement" required disabled>
+                                <option value="">Sélectionnez d'abord un département</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>District de santé</label>
+                            <select id="districtSante">
+                                <option value="">Sélectionnez un district</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Aire de santé</label>
+                            <input type="text" id="aireSante" placeholder="Nom de l'aire de santé">
+                        </div>
+                        <div class="form-group">
+                            <label>Formation sanitaire</label>
+                            <input type="text" id="formationSanitaire" placeholder="Nom de la formation sanitaire">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Lieu de naissance (Ville/Village/Quartier) <span class="required">*</span></label>
+                        <input type="text" id="lieuNaissance" required placeholder="Ex: Bot-Makak Centre">
+                    </div>
+                </div>
+
+                <!-- Step 2 - Informations enfant -->
+                <div id="step2" class="form-step">
+                    <div class="form-section-title"><i class="fas fa-child"></i> Informations sur l'enfant</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Nom <span class="required">*</span></label><input type="text" id="enfantNom" required></div>
+                        <div class="form-group"><label>Prénom(s) <span class="required">*</span></label><input type="text" id="enfantPrenom" required></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Date de naissance <span class="required">*</span></label><input type="date" id="enfantDateNaissance" required></div>
+                        <div class="form-group"><label>Sexe <span class="required">*</span></label>
+                            <select id="enfantSexe" required><option value="">Sélectionnez</option><option value="M">Masculin</option><option value="F">Féminin</option></select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Poids (kg)</label><input type="number" id="enfantPoids" step="0.1" placeholder="Ex: 3.2"></div>
+                        <div class="form-group"><label>Taille (cm)</label><input type="number" id="enfantTaille" placeholder="Ex: 50"></div>
+                        <div class="form-group"><label>Rang de naissance</label><input type="number" id="enfantRang" placeholder="Ex: 1"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Personne ayant assisté l'accouchement</label>
+                        <select id="enfantAssistant">
+                            <option value="">Sélectionnez</option><option value="medecin">Médecin</option><option value="sage_femme">Sage-femme</option>
+                            <option value="infirmiere">Infirmière</option><option value="accouchement">Accouchement traditionnel</option><option value="aucune">Aucune</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Step 3 - Informations mère -->
+                <div id="step3" class="form-step">
+                    <div class="form-section-title"><i class="fas fa-female"></i> Informations sur la mère</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Nom <span class="required">*</span></label><input type="text" id="mereNom" required></div>
+                        <div class="form-group"><label>Prénom(s) <span class="required">*</span></label><input type="text" id="merePrenom" required></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Date de naissance <span class="required">*</span></label><input type="date" id="mereDateNaissance" required></div>
+                        <div class="form-group"><label>Lieu de naissance</label><input type="text" id="mereLieuNaissance"></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Domicile</label><input type="text" id="mereDomicile"></div>
+                        <div class="form-group"><label>Profession</label><input type="text" id="mereProfession"></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Téléphone 1</label><input type="tel" id="mereTelephone1" placeholder="6XXXXXXXX"></div>
+                        <div class="form-group"><label>Téléphone 2</label><input type="tel" id="mereTelephone2" placeholder="6XXXXXXXX"></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Situation matrimoniale</label>
+                            <select id="mereSituationMatrimoniale"><option value="">Sélectionnez</option><option value="celibataire">Célibataire</option><option value="mariee">Mariée</option><option value="divorcee">Divorcée</option><option value="veuve">Veuve</option></select>
+                        </div>
+                        <div class="form-group"><label>Nationalité</label><input type="text" id="mereNationalite" value="Camerounaise"></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>N° CNI</label><input type="text" id="mereCni"></div>
+                        <div class="form-group"><label>Niveau de scolarité</label>
+                            <select id="mereNiveauScolarite"><option value="">Sélectionnez</option><option value="primaire">Primaire</option><option value="secondaire">Secondaire</option><option value="superieur">Supérieur</option><option value="sans">Sans</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 - Informations père -->
+                <div id="step4" class="form-step">
+                    <div class="form-section-title"><i class="fas fa-male"></i> Informations sur le père</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Nom <span class="required">*</span></label><input type="text" id="pereNom" required></div>
+                        <div class="form-group"><label>Prénom(s) <span class="required">*</span></label><input type="text" id="perePrenom" required></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Date de naissance</label><input type="date" id="pereDateNaissance"></div>
+                        <div class="form-group"><label>Lieu de naissance</label><input type="text" id="pereLieuNaissance"></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Domicile</label><input type="text" id="pereDomicile"></div>
+                        <div class="form-group"><label>Profession</label><input type="text" id="pereProfession"></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Téléphone 1</label><input type="tel" id="pereTelephone1" placeholder="6XXXXXXXX"></div>
+                        <div class="form-group"><label>Téléphone 2</label><input type="tel" id="pereTelephone2" placeholder="6XXXXXXXX"></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Nationalité</label><input type="text" id="pereNationalite" value="Camerounaise"></div>
+                        <div class="form-group"><label>N° CNI</label><input type="text" id="pereCni"></div>
+                    </div>
+                </div>
+
+                <!-- Step 5 - Informations déclarant -->
+                <div id="step5" class="form-step">
+                    <div class="form-section-title"><i class="fas fa-user-check"></i> Informations sur le déclarant</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Nom <span class="required">*</span></label><input type="text" id="declarantNom" required></div>
+                        <div class="form-group"><label>Prénom(s) <span class="required">*</span></label><input type="text" id="declarantPrenom" required></div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group"><label>Qualité <span class="required">*</span></label><input type="text" id="declarantQualite" required placeholder="Ex: Père, Mère, Tuteur"></div>
+                        <div class="form-group"><label>Téléphone</label><input type="tel" id="declarantTelephone" placeholder="6XXXXXXXX"></div>
+                    </div>
+                    
+                    <div class="checkbox-label">
+                        <input type="checkbox" id="declarantAttestation" required>
+                        <span>J'atteste sur l'honneur que les informations fournies sont exactes</span>
+                    </div>
+                </div>
+
+                <!-- Step 6 - Récapitulatif -->
+                <div id="step6" class="form-step">
+                    <div class="form-section-title"><i class="fas fa-check-circle"></i> Récapitulatif de la déclaration</div>
+                    <div id="recapitulatif" class="recapitulatif"></div>
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>💰 Tarif estimé :</strong> <span id="tarifEstime" style="font-size: 1.3rem; font-weight: bold;">0</span> FCFA
+                            <p style="margin-top: 8px;">Le tarif sera calculé en fonction des 45 jours après la naissance. Déclaration gratuite dans les 45 jours.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="form-navigation">
+                    <button type="button" class="btn-prev" id="prevBtn" style="display:none">◀ Précédent</button>
+                    <button type="button" class="btn-next" id="nextBtn">Suivant ▶</button>
+                    <button type="submit" class="btn-submit" id="submitBtn" style="display:none">📤 Soumettre la demande</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../../js/main.js"></script>
+    <script src="../../js/api.js"></script>
+    <script>
+        // Navigation mobile
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        if (navToggle) {
+            navToggle.addEventListener('click', () => {
+                navToggle.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+        }
+        
+        let currentStep = 1;
+        const totalSteps = 6;
+        
+        function showStep(step) {
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+                document.querySelector(`.step[data-step="${i}"]`).classList.remove('active');
+            }
+            document.getElementById(`step${step}`).classList.add('active');
+            document.querySelector(`.step[data-step="${step}"]`).classList.add('active');
+            
+            document.getElementById('prevBtn').style.display = step === 1 ? 'none' : 'flex';
+            document.getElementById('nextBtn').style.display = step === totalSteps ? 'none' : 'flex';
+            document.getElementById('submitBtn').style.display = step === totalSteps ? 'flex' : 'none';
+            
+            if (step === totalSteps) updateRecap();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            currentStep = step;
+        }
+        
+        function validateStep(step) {
+            const requiredFields = {
+                1: ['region', 'departement', 'arrondissement', 'lieuNaissance'],
+                2: ['enfantNom', 'enfantPrenom', 'enfantDateNaissance', 'enfantSexe'],
+                3: ['mereNom', 'merePrenom', 'mereDateNaissance'],
+                4: ['pereNom', 'perePrenom'],
+                5: ['declarantNom', 'declarantPrenom', 'declarantQualite']
+            };
+            
+            let valid = true;
+            if (requiredFields[step]) {
+                requiredFields[step].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el.value) {
+                        el.classList.add('error');
+                        valid = false;
+                    } else {
+                        el.classList.remove('error');
+                    }
+                });
+            }
+            
+            if (step === 5 && !document.getElementById('declarantAttestation').checked) {
+                alert('Veuillez attester sur l\'honneur que les informations sont exactes');
+                valid = false;
+            }
+            
+            return valid;
+        }
+        
+        function updateRecap() {
+            const recapitulatif = document.getElementById('recapitulatif');
+            const tarifSpan = document.getElementById('tarifEstime');
+            
+            const enfantNom = document.getElementById('enfantNom').value;
+            const enfantPrenom = document.getElementById('enfantPrenom').value;
+            const enfantDate = document.getElementById('enfantDateNaissance').value;
+            const mereNom = document.getElementById('mereNom').value;
+            const merePrenom = document.getElementById('merePrenom').value;
+            const pereNom = document.getElementById('pereNom').value;
+            const perePrenom = document.getElementById('perePrenom').value;
+            const lieu = document.getElementById('lieuNaissance').value;
+            
+            recapitulatif.innerHTML = `
+                <div class="recap-section"><h4>👶 Enfant</h4><p><strong>Nom:</strong> ${enfantNom || '-'} ${enfantPrenom || '-'}</p><p><strong>Date naissance:</strong> ${enfantDate || '-'}</p></div>
+                <div class="recap-section"><h4>👩 Mère</h4><p><strong>Nom:</strong> ${mereNom || '-'} ${merePrenom || '-'}</p></div>
+                <div class="recap-section"><h4>👨 Père</h4><p><strong>Nom:</strong> ${pereNom || '-'} ${perePrenom || '-'}</p><p><strong>Lieu:</strong> ${lieu || '-'}</p></div>
+            `;
+            
+            if (enfantDate) {
+                const birthDate = new Date(enfantDate);
+                const today = new Date();
+                const diffDays = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
+                const tarif = diffDays <= 45 ? 1000 : 10000;
+                tarifSpan.textContent = tarif;
+            } else {
+                tarifSpan.textContent = '0';
+            }
+        }
+        
+        document.getElementById('nextBtn').onclick = () => { if (validateStep(currentStep)) showStep(currentStep + 1); };
+        document.getElementById('prevBtn').onclick = () => showStep(currentStep - 1);
+        document.getElementById('submitBtn').onclick = (e) => { e.preventDefault(); alert('Demande envoyée avec succès !'); };
+        
+        document.getElementById('enfantDateNaissance').addEventListener('change', updateRecap);
+    </script>
+</body>
+</html>

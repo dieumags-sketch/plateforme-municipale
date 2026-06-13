@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes inscriptions - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/activites.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-city"></i> Plateforme Municipale</div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/index.html">Actualités</a></li>
+                <li><a href="index.html">Activités</a></li>
+                <li><a href="mes-inscriptions.html" class="active">Mes inscriptions</a></li>
+                <li><a href="../accounts/profile.html">Mon compte</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding: 120px 2rem 4rem;">
+        <h1>Mes inscriptions</h1>
+        <div id="inscriptions-list" class="inscriptions-list">
+            <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/activites';
+        const token = localStorage.getItem('auth_token');
+        
+        if (!token) window.location.href = '../accounts/login.html';
+        
+        async function loadInscriptions() {
+            try {
+                const response = await fetch(`${API_BASE}/inscriptions/mes_inscriptions/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                const container = document.getElementById('inscriptions-list');
+                
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="no-results">Vous n\'avez aucune inscription.</div>';
+                    return;
+                }
+                
+                container.innerHTML = data.map(insc => `
+                    <div class="inscription-card">
+                        <div>
+                            <h3>${escapeHtml(insc.activite_titre)}</h3>
+                            <p><i class="fas fa-calendar"></i> ${new Date(insc.activite_date).toLocaleDateString('fr-FR')}</p>
+                            <p><i class="fas fa-map-marker-alt"></i> ${insc.activite_lieu || 'Lieu à définir'}</p>
+                            <p><strong>Référence:</strong> ${insc.reference}</p>
+                        </div>
+                        <div>
+                            <span class="inscription-status status-${insc.statut}">${getStatusLabel(insc.statut)}</span>
+                            <p><strong>Montant:</strong> ${insc.montant_total} FCFA</p>
+                            <button onclick="annulerInscription(${insc.id})" class="btn-sm" style="background:#ef4444;">Annuler</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+        
+        function getStatusLabel(status) {
+            const labels = {
+                'en_attente_paiement': 'En attente de paiement',
+                'confirmee': 'Confirmée',
+                'annulee': 'Annulée'
+            };
+            return labels[status] || status;
+        }
+        
+        async function annulerInscription(id) {
+            if (confirm('Annuler cette inscription ?')) {
+                try {
+                    const response = await fetch(`${API_BASE}/inscriptions/${id}/annuler/`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (response.ok) {
+                        alert('Inscription annulée');
+                        loadInscriptions();
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error);
+                }
+            }
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        loadInscriptions();
+    </script>
+</body>
+</html>

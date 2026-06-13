@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes favoris - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .favoris-container {
+            max-width: 1000px;
+            margin: 100px auto 2rem;
+            padding: 0 2rem;
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .section-header h1 {
+            font-size: 2rem;
+            color: #1f2937;
+        }
+        .favoris-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .favori-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .favori-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .favori-image {
+            height: 150px;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+        .favori-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .favori-info {
+            padding: 1.5rem;
+        }
+        .favori-info h3 {
+            margin-bottom: 0.5rem;
+        }
+        .favori-info p {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        .favori-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .btn-detail {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        .btn-remove {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            background: #ef4444;
+            color: white;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .empty-favoris {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+        }
+        .empty-favoris i {
+            font-size: 4rem;
+            color: #d1d5db;
+            margin-bottom: 1rem;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 3rem;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            color: white;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+        .toast-success { background: #10b981; }
+        .toast-error { background: #ef4444; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @media (max-width: 768px) {
+            .favoris-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-city"></i> Plateforme Municipale</div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/index.html">Actualités</a></li>
+                <li><a href="../activites/index.html">Activités</a></li>
+                <li><a href="index.html">Annuaire</a></li>
+                <li><a href="elus.html">Élus</a></li>
+                <li><a href="mes-favoris.html" class="active"><i class="fas fa-heart"></i> Favoris</a></li>
+                <li><a href="../accounts/profile.html"><i class="fas fa-user"></i> Mon compte</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="favoris-container">
+        <div class="section-header">
+            <h1><i class="fas fa-heart" style="color: #ef4444;"></i> Mes structures favorites</h1>
+            <p>Retrouvez ici toutes les structures que vous avez ajoutées en favori</p>
+        </div>
+        <div id="favoris-grid" class="favoris-grid">
+            <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/annuaires';
+        const token = localStorage.getItem('auth_token');
+
+        if (!token) {
+            window.location.href = '../accounts/login.html';
+        }
+
+        async function loadFavoris() {
+            const container = document.getElementById('favoris-grid');
+            
+            try {
+                const response = await fetch(`${API_BASE}/favoris/`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const favoris = await response.json();
+                
+                if (favoris.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-favoris" style="grid-column: 1/-1;">
+                            <i class="fas fa-heart-broken"></i>
+                            <h3>Aucun favori</h3>
+                            <p>Vous n'avez pas encore ajouté de structures à vos favoris.</p>
+                            <a href="index.html" style="display: inline-block; margin-top: 1rem; padding: 0.75rem 1.5rem; background: #667eea; color: white; border-radius: 12px; text-decoration: none;">Découvrir l'annuaire</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = favoris.map(fav => `
+                    <div class="favori-card" data-id="${fav.structure.id}">
+                        <div class="favori-image">
+                            ${fav.structure.image_principale ? 
+                                `<img src="${fav.structure.image_principale}" alt="${escapeHtml(fav.structure.nom)}">` : 
+                                `<i class="fas fa-building"></i>`
+                            }
+                        </div>
+                        <div class="favori-info">
+                            <h3>${escapeHtml(fav.structure.nom)}</h3>
+                            <p><i class="fas fa-map-marker-alt"></i> ${escapeHtml(fav.structure.adresse || fav.structure.quartier || '')}, ${fav.structure.ville}</p>
+                            <p><i class="fas fa-phone"></i> ${fav.structure.telephone || 'Non renseigné'}</p>
+                            <div class="favori-actions">
+                                <a href="structure-detail.html?id=${fav.structure.id}" class="btn-detail"><i class="fas fa-eye"></i> Voir détails</a>
+                                <button onclick="retirerFavori(${fav.structure.id})" class="btn-remove"><i class="fas fa-trash"></i> Retirer</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erreur:', error);
+                container.innerHTML = '<div class="error">Erreur de chargement</div>';
+            }
+        }
+
+        async function retirerFavori(structureId) {
+            try {
+                const response = await fetch(`${API_BASE}/structures/${structureId}/retirer_favori/`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    showToast('Structure retirée des favoris', 'success');
+                    loadFavoris();
+                } else {
+                    showToast('Erreur', 'error');
+                }
+            } catch (error) {
+                showToast('Erreur de connexion', 'error');
+            }
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        loadFavoris();
+    </script>
+</body>
+</html>

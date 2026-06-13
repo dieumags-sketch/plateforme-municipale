@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signaler un problème - Gestion des déchets</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .container{max-width:600px;margin:100px auto 2rem;padding:2rem;background:white;border-radius:24px;box-shadow:0 10px 25px rgba(0,0,0,0.1)}
+        h1{text-align:center;margin-bottom:2rem}
+        .type-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem}
+        .type-btn{padding:1rem;border:2px solid #e5e7eb;border-radius:16px;background:white;cursor:pointer;text-align:center;transition:all 0.3s}
+        .type-btn.selected{border-color:#059669;background:#f0fdf4}
+        .type-btn i{font-size:1.5rem;display:block;margin-bottom:0.25rem}
+        .form-group{margin-bottom:1.5rem}
+        .form-group label{display:block;margin-bottom:0.5rem;font-weight:500}
+        .form-group input,.form-group textarea,.form-group select{width:100%;padding:0.75rem;border:2px solid #e5e7eb;border-radius:12px}
+        .form-group input:focus,.form-group textarea:focus{border-color:#059669;outline:none}
+        .photo-preview{width:100%;height:150px;background:#f9fafb;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-top:0.5rem;cursor:pointer}
+        .photo-preview img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+        .btn-submit{width:100%;padding:0.875rem;background:#059669;color:white;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer}
+        .geoloc-btn{width:100%;padding:0.75rem;background:#f3f4f6;border:none;border-radius:12px;margin-bottom:1rem;cursor:pointer}
+        .toast{position:fixed;bottom:20px;right:20px;padding:1rem 1.5rem;background:#10b981;color:white;border-radius:12px;z-index:9999}
+        @media (max-width:640px){.container{margin:80px 1rem 2rem;padding:1.5rem}.type-buttons{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <nav class="navbar">...</nav>
+    
+    <div class="container">
+        <h1><i class="fas fa-exclamation-triangle"></i> Signaler un problème</h1>
+        
+        <div class="type-buttons" id="type-buttons">
+            <div class="type-btn" data-type="bac_plein">🗑️ Bac plein</div>
+            <div class="type-btn" data-type="bac_debordant">⚠️ Bac débordant</div>
+            <div class="type-btn" data-type="bac_casse">🔨 Bac cassé</div>
+            <div class="type-btn" data-type="depot_sauvage">🚯 Dépôt sauvage</div>
+            <div class="type-btn" data-type="odeur">👃 Nuisance odorante</div>
+            <div class="type-btn" data-type="autre">📌 Autre</div>
+        </div>
+        
+        <input type="hidden" id="type_signalement">
+        
+        <div class="form-group">
+            <label>📍 Où ?</label>
+            <input type="text" id="adresse" placeholder="Ex: Près de l'église de Ndikinimeki">
+            <button id="geoloc-btn" class="geoloc-btn"><i class="fas fa-location-dot"></i> Utiliser ma position</button>
+            <input type="hidden" id="lat">
+            <input type="hidden" id="lng">
+        </div>
+        
+        <div class="form-group">
+            <label>📝 Description (optionnel)</label>
+            <textarea id="description" rows="3" placeholder="Plus de détails..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>📸 Photo</label>
+            <input type="file" id="photo" accept="image/*" capture="environment">
+            <div id="photo-preview" class="photo-preview"><i class="fas fa-camera"></i> Prendre une photo</div>
+        </div>
+        
+        <div class="form-group">
+            <label>👤 Votre nom (optionnel)</label>
+            <input type="text" id="nom_citoyen">
+        </div>
+        
+        <div class="form-group">
+            <label>📞 Votre téléphone (optionnel)</label>
+            <input type="tel" id="telephone">
+        </div>
+        
+        <button id="submit-btn" class="btn-submit">Envoyer le signalement</button>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000/api/dechets';
+        const token = localStorage.getItem('auth_token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!token) window.location.href = '../accounts/login.html';
+        
+        document.getElementById('nom_citoyen').value = user.full_name || '';
+        document.getElementById('telephone').value = user.telephone || '';
+        
+        let currentLocation = null;
+        
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                document.getElementById('type_signalement').value = btn.dataset.type;
+            });
+        });
+        
+        document.getElementById('geoloc-btn').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    currentLocation = {lat: pos.coords.latitude, lng: pos.coords.longitude};
+                    document.getElementById('lat').value = pos.coords.latitude;
+                    document.getElementById('lng').value = pos.coords.longitude;
+                    document.getElementById('adresse').placeholder = "Position détectée !";
+                    showToast('Position détectée', 'success');
+                }, () => showToast('Impossible de géolocaliser', 'error'));
+            }
+        });
+        
+        document.getElementById('photo').addEventListener('change', function(e) {
+            if (e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const preview = document.getElementById('photo-preview');
+                    preview.innerHTML = `<img src="${event.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+        
+        document.getElementById('submit-btn').addEventListener('click', async () => {
+            const type = document.getElementById('type_signalement').value;
+            if (!type) { showToast('Choisissez un type de signalement', 'error'); return; }
+            
+            const formData = new FormData();
+            formData.append('type_signalement', type);
+            formData.append('adresse_description', document.getElementById('adresse').value || 'Lieu non précisé');
+            formData.append('description', document.getElementById('description').value);
+            formData.append('nom_citoyen', document.getElementById('nom_citoyen').value);
+            formData.append('telephone', document.getElementById('telephone').value);
+            if (document.getElementById('lat').value) formData.append('latitude', document.getElementById('lat').value);
+            if (document.getElementById('lng').value) formData.append('longitude', document.getElementById('lng').value);
+            if (document.getElementById('photo').files[0]) formData.append('photo', document.getElementById('photo').files[0]);
+            
+            try {
+                const response = await fetch(`${API_BASE}/signalements/`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    showToast('Signalement envoyé ! Merci pour votre vigilance', 'success');
+                    setTimeout(() => window.location.href = 'index.html', 2000);
+                } else {
+                    showToast('Erreur lors de l\'envoi', 'error');
+                }
+            } catch (error) {
+                showToast('Erreur de connexion', 'error');
+            }
+        });
+        
+        function showToast(msg, type) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+            toast.innerHTML = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

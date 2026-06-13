@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enlèvement encombrants - Bot-Makak</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .container{max-width:600px;margin:100px auto 2rem;padding:2rem;background:white;border-radius:24px}
+        h1{text-align:center;margin-bottom:1.5rem}
+        .form-group{margin-bottom:1.5rem}
+        .form-group label{display:block;margin-bottom:0.5rem;font-weight:500}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:0.75rem;border:2px solid #e5e7eb;border-radius:12px}
+        .btn-submit{width:100%;padding:0.875rem;background:#059669;color:white;border:none;border-radius:12px;font-size:1rem;cursor:pointer}
+        .toast{position:fixed;bottom:20px;right:20px;padding:1rem 1.5rem;background:#10b981;color:white;border-radius:12px;z-index:9999}
+    </style>
+</head>
+<body>
+    <nav class="navbar">...</nav>
+    
+    <div class="container">
+        <h1><i class="fas fa-truck"></i> Demande d'enlèvement d'encombrants</h1>
+        
+        <div class="form-group">
+            <label>Type d'encombrant *</label>
+            <select id="type">
+                <option value="meuble">🪑 Meuble (canapé, armoire, lit)</option>
+                <option value="electromenager">🔌 Électroménager (machine, four)</option>
+                <option value="frigo">❄️ Réfrigérateur / Congélateur</option>
+                <option value="matelas">🛏️ Matelas</option>
+                <option value="dechets_vert">🌿 Déchets verts (branches, tonte)</option>
+                <option value="gravats">🏗️ Gravats (petite quantité)</option>
+                <option value="autre">📦 Autre</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Adresse de dépôt *</label>
+            <input type="text" id="adresse" placeholder="Ex: Devant la case jaune près de l'église">
+            <button id="geoloc-btn" style="margin-top:0.5rem;padding:0.5rem;background:#f3f4f6;border:none;border-radius:8px;cursor:pointer"><i class="fas fa-location-dot"></i> Utiliser ma position</button>
+        </div>
+        
+        <div class="form-group">
+            <label>Point de repère</label>
+            <input type="text" id="point_repere" placeholder="Ex: À côté du grand manguier">
+        </div>
+        
+        <div class="form-group">
+            <label>Date souhaitée</label>
+            <input type="date" id="date_souhaitee">
+        </div>
+        
+        <div class="form-group">
+            <label>Créneau horaire</label>
+            <input type="text" id="creneau" placeholder="Ex: Matin 8h-12h">
+        </div>
+        
+        <div class="form-group">
+            <label>Description</label>
+            <textarea id="description" rows="3" placeholder="Plus de détails sur l'encombrant..."></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label>Photo (optionnel)</label>
+            <input type="file" id="photo" accept="image/*">
+        </div>
+        
+        <button id="submit-btn" class="btn-submit">Demander l'enlèvement</button>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000/api/dechets';
+        const token = localStorage.getItem('auth_token');
+        
+        if (!token) window.location.href = '../accounts/login.html';
+        
+        document.getElementById('geoloc-btn').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    document.getElementById('adresse').placeholder = `Position: ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+                    showToast('Position détectée', 'success');
+                });
+            }
+        });
+        
+        document.getElementById('submit-btn').addEventListener('click', async () => {
+            const formData = new FormData();
+            formData.append('type_encombrant', document.getElementById('type').value);
+            formData.append('adresse', document.getElementById('adresse').value);
+            formData.append('point_repere', document.getElementById('point_repere').value);
+            formData.append('date_souhaitee', document.getElementById('date_souhaitee').value);
+            formData.append('creneau_horaire', document.getElementById('creneau').value);
+            formData.append('description', document.getElementById('description').value);
+            if (document.getElementById('photo').files[0]) formData.append('photo', document.getElementById('photo').files[0]);
+            
+            try {
+                const response = await fetch(`${API_BASE}/demandes/`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    showToast('Demande envoyée ! Vous serez contacté rapidement', 'success');
+                    setTimeout(() => window.location.href = 'index.html', 2000);
+                } else {
+                    showToast('Erreur', 'error');
+                }
+            } catch (error) {
+                showToast('Erreur de connexion', 'error');
+            }
+        });
+        
+        function showToast(msg, type) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+            toast.innerHTML = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

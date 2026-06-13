@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement - Plateforme Municipale</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .payment-container { max-width: 500px; margin: 120px auto 2rem; background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        .payment-methods { display: flex; gap: 1rem; margin: 1.5rem 0; }
+        .payment-method { flex: 1; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .payment-method.selected { border-color: #667eea; background: #f0f4ff; }
+        .payment-method i { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input { width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 12px; }
+        .btn-primary { width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .montant { text-align: center; font-size: 2rem; color: #667eea; font-weight: bold; margin: 1rem 0; }
+        .toast-notification { position: fixed; bottom: 20px; right: 20px; padding: 1rem 1.5rem; border-radius: 12px; color: white; z-index: 9999; }
+        .toast-success { background: #10b981; }
+        .toast-error { background: #ef4444; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-city"></i> Plateforme Municipale</div>
+            <ul class="nav-menu">
+                <li><a href="../../index.html">Accueil</a></li>
+                <li><a href="../actualites/index.html">Actualités</a></li>
+                <li><a href="index.html">Activités</a></li>
+                <li><a href="mes-inscriptions.html">Mes inscriptions</a></li>
+                <li><a href="../accounts/profile.html">Mon compte</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="payment-container">
+        <h2>Paiement de l'inscription</h2>
+        <div class="montant" id="montant"></div>
+        
+        <form id="paiement-form">
+            <input type="hidden" id="inscription_id">
+            <label>Choisissez votre moyen de paiement :</label>
+            <div class="payment-methods">
+                <div class="payment-method" data-method="mtn">
+                    <i class="fas fa-mobile-alt"></i>
+                    <strong>MTN Mobile Money</strong>
+                </div>
+                <div class="payment-method" data-method="orange">
+                    <i class="fas fa-mobile-alt"></i>
+                    <strong>Orange Money</strong>
+                </div>
+            </div>
+            <input type="hidden" id="moyen_paiement" value="mtn">
+            
+            <div class="form-group">
+                <label>Numéro de téléphone Mobile Money *</label>
+                <input type="tel" id="telephone_paiement" placeholder="6XXXXXXXX" required>
+            </div>
+            
+            <button type="submit" class="btn-primary">Payer maintenant</button>
+        </form>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/activites';
+        const token = localStorage.getItem('auth_token');
+        
+        if (!token) window.location.href = '../accounts/login.html';
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const inscriptionId = urlParams.get('id');
+        const montant = urlParams.get('montant');
+        
+        if (!inscriptionId) window.location.href = 'mes-inscriptions.html';
+        
+        document.getElementById('inscription_id').value = inscriptionId;
+        document.getElementById('montant').innerHTML = `${parseInt(montant).toLocaleString()} FCFA`;
+        
+        document.querySelectorAll('.payment-method').forEach(el => {
+            el.addEventListener('click', () => {
+                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+                el.classList.add('selected');
+                document.getElementById('moyen_paiement').value = el.dataset.method;
+            });
+        });
+        
+        document.getElementById('paiement-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const moyenPaiement = document.getElementById('moyen_paiement').value;
+            const telephone = document.getElementById('telephone_paiement').value;
+            
+            if (!telephone || telephone.length < 9) {
+                showToast('Numéro de téléphone invalide', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/paiements/initier/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({
+                        inscription_id: parseInt(inscriptionId),
+                        moyen_paiement: moyenPaiement,
+                        numero_telephone: telephone
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showToast('Paiement initié. Confirmez sur votre téléphone.', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'mes-inscriptions.html';
+                    }, 3000);
+                } else {
+                    showToast(data.error || 'Erreur de paiement', 'error');
+                }
+            } catch (error) {
+                showToast('Erreur de connexion', 'error');
+            }
+        });
+        
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
