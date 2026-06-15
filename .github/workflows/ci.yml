@@ -80,7 +80,7 @@ jobs:
 
       # 1. Vérifier le HTML
       - name: Validate HTML
-        uses: Cyb3r-Jak3/html5validator-action@v7
+        uses: Cyb3r-Jak3/html5validator-action@v8
         with:
           root: ./
           log_level: WARN
