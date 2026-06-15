@@ -1,0 +1,11 @@
+{
+  "name": "plateforme-municipale-frontend",
+  "version": "1.0.0",
+  "description": "Frontend HTML/CSS/JS pour plateforme municipale",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Build du frontend terminé'"
+  },
+  "author": "",
+  "license": "ISC"
+}

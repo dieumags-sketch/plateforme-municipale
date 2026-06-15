@@ -9,7 +9,17 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
-    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
     - uses: actions/checkout@v4
     
@@ -17,6 +27,14 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
     
     - name: Install dependencies
       run: |
@@ -36,7 +54,6 @@ jobs:
 
   frontend:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v4
     
@@ -50,7 +67,7 @@ jobs:
         cd frontend
         npm ci || npm install
     
-    - name: Build
+    - name: Build frontend
       run: |
         cd frontend
-        npm run build || echo "No build script"
+        npm run build || echo "No build script found"
